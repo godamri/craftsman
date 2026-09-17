@@ -1,0 +1,28 @@
+# Unrelated export & snapshot files
+craft.txt
+
+# Internal / Environment metadata
+.gd/
+.gd
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Editor & IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.bak
+
+# Language caches & build artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+node_modules/
+*.log
