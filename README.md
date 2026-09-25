@@ -6,7 +6,7 @@ Practical engineering skills for AI coding agents, focused on evidence, correctn
 
 ## What It Is
 
-Craftsman is a collection of 13 modular engineering skills designed for AI coding agents and human software engineers. Rather than providing application-specific boilerplate or code generators, each skill provides operational engineering discipline—establishing concrete constraints, trade-off models, and verification criteria for distinct domains of software construction and system operations.
+Craftsman is a collection of 14 modular engineering skills designed for AI coding agents and human software engineers. Rather than providing application-specific boilerplate or code generators, each skill provides operational engineering discipline—establishing concrete constraints, trade-off models, and verification criteria for distinct domains of software construction and system operations.
 
 The collection emphasizes:
 - Understanding existing codebases before proposing changes.
@@ -39,6 +39,7 @@ The collection emphasizes:
 | [devops-craftsman](devops-craftsman/) | Infrastructure administration, credential security, database operations, failure recovery, and zero-downtime rollouts. |
 | [distributed-systems-craftsman](distributed-systems-craftsman/) | State consistency, idempotency, delivery semantics, fencing tokens, outbox patterns, and resilient recovery. |
 | [engineering-craftsman](engineering-craftsman/) | Cross-cutting engineering lifecycle discipline: requirements, domain modeling, resilience, security, and release gates. |
+| [execution-craftsman](execution-craftsman/) | Milestone-based engineering execution: tactical execution loops, claim-dependent evidence, falsification, and regression verification. |
 | [go-craftsman](go-craftsman/) | Correctness, explicit error propagation, structured concurrency, memory ownership, and test verification in Go (1.22+). |
 | [python-craftsman](python-craftsman/) | Simple sufficient design, explicit failure semantics, data modeling, safe concurrency, and measurable performance in Python (3.12+). |
 | [qa-craftsman](qa-craftsman/) | Risk-based testing strategy, invariant assertions, concurrency verification, failure injection, and deterministic release gates. |
@@ -105,6 +106,7 @@ Distributed Service Endpoint:
 ├── devops-craftsman/
 ├── distributed-systems-craftsman/
 ├── engineering-craftsman/
+├── execution-craftsman/
 ├── go-craftsman/
 ├── python-craftsman/
 ├── qa-craftsman/

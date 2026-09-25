@@ -29,4 +29,4 @@ Before writing design documents or code, every initiative must answer these 10 f
 | :--- | :--- | :--- |
 | **"Let's rewrite in Microservices"** | Technology fashion / CV-driven development | Reject unless independent scaling, deployment cadence, or team ownership boundaries mandate it. |
 | **"We need AI/LLM for this"** | Hype over substance | Use deterministic algorithms, standard SQL queries, or simple heuristics if they solve the problem reliably at 1/1000th the cost. |
-| **"Let's build a bespoke framework"** | Not-Invented-Here syndrome | Use battle-tested standard libraries. Build bespoke tools only when core competitive advantage demands it. |
+| **"Let's build a bespoke framework"** | Not-Invented-Here syndrome | Use proven standard libraries. Build bespoke tools only when core competitive advantage demands it. |
