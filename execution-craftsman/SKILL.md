@@ -287,6 +287,7 @@ FINAL ENGINEERING REPORT
 5. **PROHIBITED**: Casually promoting *Implemented* to *Verified*, or *Verified* to *Validated* or *Production Ready*, without explicit supporting evidence.
 6. **PROHIBITED**: Continuing implementation after milestone exit criteria are satisfied without new evidence or explicit user instruction.
 7. **PROHIBITED**: Concealing discovered defects, intermittent test failures, or environmental gaps from milestone and final engineering reports.
+8. **PROHIBITED**: Generating decorative ASCII banners, obvious syntax restatements, or low-information noise in code comments and milestone reports.
 
 ---
 
@@ -303,6 +304,7 @@ Before certifying any milestone or closing an engineering task:
 - [ ] **Defects Root-Caused**: Were all encountered bugs diagnosed via hypotheses and resolved with minimal justified fixes?
 - [ ] **Persistence & Concurrency Checked**: Was persisted data reloaded independently, and was concurrent access verified if applicable?
 - [ ] **Regression Clean**: Did the blast-radius regression suite pass with zero regressions?
+- [ ] **Comment & Output Hygiene Maintained**: Does generated code preserve *why* without syntax restatement, decorative banners, or emoji clutter?
 - [ ] **Evidence Coverage Documented**: Does the final report honestly distinguish `FACT`, `INFERENCE`, and `UNKNOWN`?
 
 ---

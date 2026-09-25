@@ -73,6 +73,9 @@ Split code at meaningful loading boundaries (e.g. route-level lazy loading via `
 ### 12. Ownership Colocation & Justified Abstraction
 Keep state, logic, and dependencies close to the feature that owns them. Extract shared abstractions only when concrete reuse or clear architectural boundaries justify the added indirection.
 
+### 13. Interface & Visual Hygiene
+Visual patterns require functional or brand justification. Avoid generic generated clichés (gratuitous gradients, background glow orbs, excessive glassmorphism, decorative pills above headings, arbitrary icons) that add noise without communicating hierarchy or state. Visual styling must always remain subordinate to accessibility, semantics, and complete state coverage. See [references/10_interface_and_visual_hygiene.md](references/10_interface_and_visual_hygiene.md).
+
 ---
 
 ## Explicit Prohibitions
@@ -99,6 +102,7 @@ Before shipping any React component or application:
 - [ ] **Async Lifecycles Safe**: Are asynchronous operations protected against stale race conditions upon parameter changes or unmount?
 - [ ] **Failure Domains Isolated**: Are Error Boundaries placed around critical route or widget boundaries to isolate render-time exceptions?
 - [ ] **Bundle & Splitting Evaluated**: Are heavy, route-level components split at logical loading boundaries where bundle size warrants it?
+- [ ] **Interface & Visual Hygiene Checked**: Are visual styles purposeful without gratuitous decorative clichés (unjustified gradients, excessive glassmorphism, unsemantic icons), with WCAG contrast preserved?
 
 ---
 

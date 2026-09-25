@@ -106,6 +106,9 @@ All production modifications (code deployments, database schema migrations, infr
 ### 12. Explicit Operational Ownership & Life-Cycle Durability
 Every production service, database table, queue, and alert must have designated technical, operational, and business owners. Systems must remain operable, maintainable, and upgradeable after team transitions, dependency deprecations, and business scale increases.
 
+### 13. High-Signal Documentation & Output Hygiene
+Comments must preserve information that would otherwise be lost. Document the *why* (domain rationale, non-obvious invariants, concurrency constraints, vendor workarounds); let the code explain the *what*. Actively eliminate low-information noise: decorative ASCII banners, syntax restatement, workflow step narration, empty labels, and decorative emoji. See [references/19-code-comments-and-documentation-hygiene.md](references/19-code-comments-and-documentation-hygiene.md).
+
 ---
 
 ## 4. Constitutional Prohibitions
@@ -120,6 +123,7 @@ Every production service, database table, queue, and alert must have designated 
 8. **PROHIBITED**: Hardcoding or logging credentials, private tokens, API keys, or unredacted Personally Identifiable Information (PII).
 9. **PROHIBITED**: Relying on "works on my machine" or passing happy-path unit tests as evidence for release readiness.
 10. **PROHIBITED**: Deploying unowned services, unmonitored cron jobs, or uninstrumented critical endpoints to production.
+11. **PROHIBITED**: Polluting codebases with decorative ASCII banners, obvious syntax restatements, or low-information generated commentary.
 
 ---
 

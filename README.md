@@ -29,6 +29,23 @@ The collection emphasizes:
 
 ---
 
+## See the Difference: Engineering Behavior
+
+The impact of Craftsman is observed in how an AI agent designs, scopes, and verifies technical tasks.
+
+### Scenario: Implementing a Concurrent Account Deduction
+
+| Dimension | Typical AI Coding Agent Behavior | With Craftsman |
+| :--- | :--- | :--- |
+| **Reconnaissance** | Immediately writes new code; assumes framework and database defaults. | Inspects existing transaction managers, isolation levels, and error conventions first. |
+| **Data Invariants** | Writes non-locking `SELECT balance` followed by `UPDATE accounts SET balance = balance - $1`. Vulnerable to concurrent race conditions. | Uses `SELECT ... FOR UPDATE` inside transaction boundary; relies on database `CHECK (balance >= 0)` as the authoritative barrier. |
+| **Scope Control** | Refactors neighboring files, upgrades dependencies, or introduces unrequested abstractions. | Classifies changes as `REQUIRED` or `REQUIRED FOR VERIFICATION`. Defers optional improvements. |
+| **Code Comments** | Adds decorative ASCII banners (`// ======`) and restates syntax (`// Step 1: deduct balance`). | Documents the concurrency invariant (*why*); deletes decorative banners and obvious syntax echoes. |
+| **Verification** | Runs single happy-path unit test; declares *"Completed and production ready"*. | Executes adversarial falsification: 20-worker parallel race barrier drill; verifies final balance and rollback behavior. |
+| **Completion Claim** | Conflates code compilation with production readiness. | Distinguishes `Implemented` vs `Verified` vs `Production Ready`; reports explicit evidence coverage and remaining gaps. |
+
+---
+
 ## Skills
 
 | Skill | Focus |
@@ -70,11 +87,49 @@ skill-name/
 
 ## How to Use
 
-Craftsman skills are designed to be consumed by AI coding agents and human engineers as domain-specific engineering guidance.
+Craftsman skills can be installed into your coding agent's environment or referenced directly within project repositories.
 
-1. **Select the relevant skill**: Identify the skill matching your current engineering domain or task (e.g., `react-craftsman` for frontend state, `database-craftsman` for SQL schema evolution).
-2. **Provide the skill to your agent**: Supply the skill directory or its `SKILL.md` into your coding agent's supported custom instructions, system prompt, or skill discovery folder.
-3. **Inspect and apply**: The agent uses the skill's decision rules and checklist while inspecting the target codebase, verifying existing patterns before writing or modifying code.
+### Option 1: Via Open Agent Skills Registry (`skills.sh`)
+
+Install directly using the open agent skills CLI:
+
+```bash
+# Install all 14 skills to your detected agent environment:
+npx skills add godamri/craftsman
+
+# Or install specific skills:
+npx skills add godamri/craftsman --skill database-craftsman execution-craftsman
+```
+
+### Option 2: Via Local Repository Installer (`install.sh`)
+
+Use the included idempotent installer to symlink or copy skills into your target project or global agent directory:
+
+```bash
+# Symlink skills into local project (.agents/skills):
+./install.sh --target .agents/skills
+
+# Copy skills to Claude Code global directory:
+./install.sh --target ~/.claude/skills --copy
+
+# Safe reversal (uninstall):
+./install.sh --target .agents/skills --uninstall
+```
+
+### Option 3: Agent Configuration Pointer
+
+For agents that read root configuration files (`AGENTS.md`, `CLAUDE.md`, or `GEMINI.md`), point your agent to the relevant skills:
+
+```markdown
+<!-- craftsman:start -->
+## Engineering Standards
+
+For system architecture, database changes, and implementation execution:
+- Review `.agents/skills/execution-craftsman` for milestone and verification loops.
+- Review `.agents/skills/database-craftsman` for SQL, migrations, and concurrency.
+- Review `.agents/skills/scope-guard-craftsman` to prevent unrequested changes.
+<!-- craftsman:end -->
+```
 
 ---
 
@@ -114,6 +169,7 @@ Distributed Service Endpoint:
 ├── rust-craftsman/
 ├── scope-guard-craftsman/
 ├── security-craftsman/
+├── install.sh
 ├── LICENSE
 └── README.md
 ```
