@@ -1,5 +1,8 @@
 # Craftsman
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![skills.sh](https://skills.sh/b/godamri/craftsman)](https://skills.sh/godamri/craftsman)
+
 Practical engineering skills for AI coding agents, focused on evidence, correctness, boundaries, safety, and verification.
 
 ---
