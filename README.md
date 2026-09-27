@@ -9,7 +9,7 @@ Practical engineering skills for AI coding agents, focused on evidence, correctn
 
 ## What It Is
 
-Craftsman is a collection of 14 modular engineering skills designed for AI coding agents and human software engineers. Rather than providing application-specific boilerplate or code generators, each skill provides operational engineering discipline—establishing concrete constraints, trade-off models, and verification criteria for distinct domains of software construction and system operations.
+Craftsman is a collection of 15 modular engineering skills designed for AI coding agents and human software engineers. Rather than providing application-specific boilerplate or code generators, each skill provides operational engineering discipline—establishing concrete constraints, trade-off models, and verification criteria for distinct domains of software construction and system operations.
 
 The collection emphasizes:
 - Understanding existing codebases before proposing changes.
@@ -67,6 +67,7 @@ The impact of Craftsman is observed in how an AI agent designs, scopes, and veri
 | [rust-craftsman](rust-craftsman/) | Memory safety, sound ownership, explicit error handling, async Tokio lifecycles, and verification gates in Rust (2021/2024). |
 | [scope-guard-craftsman](scope-guard-craftsman/) | Operational discipline for coding agents to identify and execute the smallest justified change before implementation. |
 | [security-craftsman](security-craftsman/) | Threat modeling, fail-closed authorization, input sanitization, secret lifecycle management, and injection defense. |
+| [web-design-craftsman](web-design-craftsman/) | Practical web and interface design: content-first architecture, contextual information density, accessibility invariants, and light-first visual defaults. |
 
 ---
 
@@ -97,11 +98,11 @@ Craftsman skills can be installed into your coding agent's environment or refere
 Install directly using the open agent skills CLI:
 
 ```bash
-# Install all 14 skills to your detected agent environment:
+# Install all 15 skills to your detected agent environment:
 npx skills add godamri/craftsman
 
 # Or install specific skills:
-npx skills add godamri/craftsman --skill database-craftsman execution-craftsman
+npx skills add godamri/craftsman --skill database-craftsman execution-craftsman web-design-craftsman
 ```
 
 ### Option 2: Via Local Repository Installer (`install.sh`)
@@ -112,8 +113,14 @@ Use the included idempotent installer to symlink or copy skills into your target
 # Symlink skills into local project (.agents/skills):
 ./install.sh --target .agents/skills
 
+# Install skills and configure IDE assistant rules (Cursor, Windsurf, Copilot, Claude, Cline, AGENTS.md):
+./install.sh --ide all
+
 # Copy skills to Claude Code global directory:
 ./install.sh --target ~/.claude/skills --copy
+
+# Install a specific skill:
+./install.sh --skill web-design-craftsman
 
 # Safe reversal (uninstall):
 ./install.sh --target .agents/skills --uninstall
@@ -150,6 +157,11 @@ Distributed Service Endpoint:
 ├── architecture-craftsman          # Verifies boundary contracts and state ownership
 ├── distributed-systems-craftsman   # Defines idempotency keys and transactional outbox
 └── security-craftsman              # Enforces fail-closed auth and input sanitization
+
+Web Interface & Landing Page:
+├── web-design-craftsman            # Enforces content-first layout, light-first canvas, and visual thesis
+├── react-craftsman                 # Enforces minimal state, clean lifecycles, and accessible UI
+└── qa-craftsman                    # Validates WCAG contrast, responsive breakpoints, and interaction states
 ```
 
 ---
@@ -172,6 +184,7 @@ Distributed Service Endpoint:
 ├── rust-craftsman/
 ├── scope-guard-craftsman/
 ├── security-craftsman/
+├── web-design-craftsman/
 ├── install.sh
 ├── LICENSE
 └── README.md
