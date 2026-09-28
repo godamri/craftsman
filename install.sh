@@ -33,6 +33,7 @@ Before executing modifications, inspect the applicable skill:
 - **Web & Interface Design**: .agents/skills/web-design-craftsman/SKILL.md (Content-first design, visual hierarchy, light-first default)
 - **Language Crafts**: .agents/skills/{go,python,react,rust}-craftsman/SKILL.md
 - **Infrastructure & Quality**: .agents/skills/{devops,qa,distributed-systems,business}-craftsman/SKILL.md
+- **Intake & Skill Orchestration**: .agents/skills/wizard-craftsman/SKILL.md (Transforms ambiguous or multi-domain requests into bounded execution contracts)
 
 Rules for Agents:
 1. Read the relevant SKILL.md before generating architectural or implementation plans.

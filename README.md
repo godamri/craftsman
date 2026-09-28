@@ -9,7 +9,7 @@ Practical engineering skills for AI coding agents, focused on evidence, correctn
 
 ## What It Is
 
-Craftsman is a collection of 15 modular engineering skills designed for AI coding agents and human software engineers. Rather than providing application-specific boilerplate or code generators, each skill provides operational engineering discipline—establishing concrete constraints, trade-off models, and verification criteria for distinct domains of software construction and system operations.
+Craftsman is a collection of 16 modular engineering skills designed for AI coding agents and human software engineers. Rather than providing application-specific boilerplate or code generators, each skill provides operational engineering discipline—establishing concrete constraints, trade-off models, and verification criteria for distinct domains of software construction and system operations.
 
 The collection emphasizes:
 - Understanding existing codebases before proposing changes.
@@ -68,6 +68,7 @@ The impact of Craftsman is observed in how an AI agent designs, scopes, and veri
 | [scope-guard-craftsman](scope-guard-craftsman/) | Operational discipline for coding agents to identify and execute the smallest justified change before implementation. |
 | [security-craftsman](security-craftsman/) | Threat modeling, fail-closed authorization, input sanitization, secret lifecycle management, and injection defense. |
 | [web-design-craftsman](web-design-craftsman/) | Practical web and interface design: content-first architecture, contextual information density, accessibility invariants, and light-first visual defaults. |
+| [wizard-craftsman](wizard-craftsman/) | Intake compilation and skill orchestration: transforms ambiguous or multi-domain requests into bounded execution contracts by selecting the minimum sufficient Craftsman skills. |
 
 ---
 
@@ -98,7 +99,7 @@ Craftsman skills can be installed into your coding agent's environment or refere
 Install directly using the open agent skills CLI:
 
 ```bash
-# Install all 15 skills to your detected agent environment:
+# Install all 16 skills to your detected agent environment:
 npx skills add godamri/craftsman
 
 # Or install specific skills:
