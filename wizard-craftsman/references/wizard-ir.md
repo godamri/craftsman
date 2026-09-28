@@ -34,7 +34,8 @@ export type EvidenceLevel =
   | 'OBSERVED'
   | 'SUPPORTED'
   | 'INFERRED'
-  | 'UNKNOWN'
+  | 'UNKNOWN_INSPECT'   // Resolvable by reconnaissance; agent inspects and records
+  | 'UNKNOWN_DECIDE'    // Requires human decision; reconnaissance cannot resolve
   | 'CONFLICT';
 
 export interface SkillSelection {
@@ -90,10 +91,12 @@ export interface WizardIR {
 
   status:
     | 'READY'
+    | 'READY_PENDING_APPROVAL'
     | 'AWAITING_CLARIFICATION'
     | 'REPLAN_REQUIRED';
 }
 ```
+
 
 ---
 
@@ -104,12 +107,18 @@ export interface WizardIR {
   - `KNOWN`: User prompt is specific, bounded, and contains zero architecture-altering ambiguities.
   - `SUPPORTED`: A non-material interpretation supported by explicit prompt context and available repository evidence, while remaining subject to correction.
   - `AWAITING_CLARIFICATION`: The request contains material ambiguity. Blocks architectural commitment.
-- **Top-Level `status` (Workflow Disposition)**: Answers *"What is the immediate execution disposition of this contract?"*
-  - `READY`: Contract compiled and cleared for execution (or awaiting human approval if High Risk).
-  - `AWAITING_CLARIFICATION`: Material ambiguity detected; architectural commitment and code modification prohibited.
-  - `REPLAN_REQUIRED`: Conceptual v0.1 disposition indicating downstream boundary conflict or invalidated brief assumption requiring re-compilation.
+- **Top-Level `status` (Workflow Disposition)**: Answers *"Can execution begin right now?"*
+  - `READY`: Planning complete. No blocking human decision remains. Execution permitted.
+  - `READY_PENDING_APPROVAL`: Planning complete. Required human approval not yet granted. Execution prohibited.
+  - `AWAITING_CLARIFICATION`: Material ambiguity detected; contract cannot yet be compiled. Architectural commitment and code modification prohibited.
+  - `REPLAN_REQUIRED`: A previously accepted contract has encountered a new boundary, constraint, or decision that invalidates the current execution plan. Recompile before continuing.
 
 These fields answer different questions and are not redundant.
+
+### Approval Lifecycle Invariant
+- `READY_PENDING_APPROVAL` → human approves → `READY` (execution permitted).
+- `READY_PENDING_APPROVAL` → human rejects or changes a decision → `REPLAN_REQUIRED`.
+- Human approval authorizes execution of the bounded contract. It does **not** silently resolve unresolved architectural decisions or expand scope.
 
 ### `intent`
 - **`status`**: Epistemic state (`KNOWN`, `SUPPORTED`, `AWAITING_CLARIFICATION`).
@@ -121,7 +130,8 @@ These fields answer different questions and are not redundant.
 
 ### `evidence`
 - Array of facts evaluated during intake.
-- Any fact marked `[UNKNOWN]` represents missing repository evidence. Every material `[UNKNOWN]` required for the selected contract or verification obligations must produce a corresponding reconnaissance directive. Irrelevant unknowns do not generate reconnaissance directives.
+- Use `UNKNOWN_INSPECT` for facts that can be established through repository, environment, or system reconnaissance without requiring a human decision. Every material `UNKNOWN_INSPECT` fact required for the contract must produce a corresponding reconnaissance directive.
+- Use `UNKNOWN_DECIDE` for facts that cannot be resolved by reconnaissance because they represent a human-owned product, architectural, boundary, or policy decision. Every material `UNKNOWN_DECIDE` required for the contract must be surfaced for human resolution. Agent must NOT silently choose a value. A material `UNKNOWN_DECIDE` results in `status: READY_PENDING_APPROVAL`, not `READY`.
 - For benchmark/hypothetical examples, facts must use `[FIXTURE]` or `[EXAMPLE CONTEXT]` rather than `[OBSERVED]`.
 
 ### `skills`
@@ -140,10 +150,10 @@ These fields answer different questions and are not redundant.
 - `policy`:
   - `NONE`: Low risk, zero material ambiguity, immediate execution permitted.
   - `RECOMMENDED`: Medium risk, brief presented for review.
-  - `MANDATORY`: High risk or present material ambiguities. Execution blocked until human approves.
+  - `MANDATORY`: High risk or present material ambiguities. Execution blocked until human approves; emit `READY_PENDING_APPROVAL`.
 
 ### `status`
-- Top-level workflow disposition (`READY`, `AWAITING_CLARIFICATION`, `REPLAN_REQUIRED`).
+- Top-level workflow disposition: `READY`, `READY_PENDING_APPROVAL`, `AWAITING_CLARIFICATION`, `REPLAN_REQUIRED`.
 
 ---
 
@@ -153,5 +163,7 @@ Any valid `WizardIR` instance must satisfy these deterministic rules:
 
 1. **Mutual Exclusion**: `skills.name` and `meaningful_exclusions.skill` must be disjoint sets. No skill can be simultaneously selected and excluded.
 2. **Ambiguity Gate**: If `intent.material_ambiguities.length > 0`, then `intent.status === 'AWAITING_CLARIFICATION'`, `risk.policy === 'MANDATORY'`, and `status === 'AWAITING_CLARIFICATION'`.
-3. **Conditionality Binding**: Every skill with `tier === 'CONDITIONAL'` must have a valid `condition` string.
-4. **Boundary Ownership**: No two skills in `skills` may declare identical boundary responsibilities.
+3. **DECIDE Gate**: If any `evidence` entry has `level === 'UNKNOWN_DECIDE'` and that decision is material to the contract, then `status !== 'READY'`. Prefer `READY_PENDING_APPROVAL` when the contract is otherwise complete and only human clearance is missing.
+4. **Conditionality Binding**: Every skill with `tier === 'CONDITIONAL'` must have a valid `condition` string.
+5. **Boundary Ownership**: No two skills in `skills` may declare identical boundary responsibilities.
+

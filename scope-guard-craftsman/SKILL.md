@@ -142,6 +142,43 @@ Verify enough to prove the change works and that scope did not drift unexpectedl
 
 ---
 
+## 9. Challenging Wizard-Generated Scope
+
+When a prior `wizard-craftsman` Execution Brief defines milestone scope, Scope Guard may apply the **smallest-justified-change test** to any component of that scope — including components already included in the brief — before implementation begins.
+
+If a component in the Wizard-defined scope is not concretely required to satisfy the current milestone objective or its stated verification obligations, Scope Guard may flag it as a **deferral candidate**.
+
+### What Scope Guard May Do
+
+- **Challenge** any milestone component using the same evidence-based justification test applied to implementation decisions.
+- **Flag deferral candidates** with a clear rationale: what the component is, why it may not be required for the current milestone, and what milestone it more properly belongs to.
+- **Request justification** from the producing Wizard contract or the human before implementation proceeds.
+
+### What Scope Guard Must NOT Do
+
+- Silently remove requirements from the Wizard contract.
+- Rewrite the Wizard scope without human resolution.
+- Make architectural or product decisions about what is "really" needed.
+- Resolve `[UNKNOWN:DECIDE]` values that are still awaiting human decision.
+
+### Challenge Resolution
+
+```text
+Wizard Execution Brief
+        ↓
+Scope Guard identifies deferral candidate
+        ↓
+Scope Guard surfaces challenge (component, rationale, suggested milestone)
+        ↓
+Human (or Wizard re-invocation) resolves
+        ↓
+Execution proceeds with resolved scope
+```
+
+Scope Guard is a **scope challenge authority**, not a replacement Wizard. The challenge must be surfaced and resolved before implementation changes the code.
+
+---
+
 ## License
 
 This skill is open source under the [MIT License](LICENSE).

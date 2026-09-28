@@ -95,7 +95,7 @@ Wizard compiles requests into bounded execution contracts through this sequentia
    ↓
 3. Scope Bounding            --> Apply the first-sentence rule: identify what changes and what stays untouched.
    ↓
-4. Evidence Analysis         --> Label known facts vs missing material facts ([UNKNOWN]).
+4. Evidence Analysis         --> Classify known facts vs missing material facts ([UNKNOWN:INSPECT] or [UNKNOWN:DECIDE]).
    ↓
 5. Ambiguity Gate            --> Detect material ambiguities; block architectural commitment if found.
    ↓
@@ -143,8 +143,15 @@ Wizard strictly adheres to empirical evidence standards. Distinguish certainty l
 - `[OBSERVED]` — Directly witnessed in the inspected repository (e.g. file present on disk, package listed in manifest).
 - `[SUPPORTED]` — A non-material interpretation supported by explicit prompt context and available repository evidence, while remaining subject to correction. (A mere guess or unsupported assumption is not sufficient).
 - `[INFERRED]` — Reasonable deduction requiring explicit validation.
-- `[UNKNOWN]` — Necessary repository fact not yet established. Triggers reconnaissance; never guessing.
+- `[UNKNOWN:INSPECT]` — A fact currently unknown but establishable through authorized repository, environment, dependency, documentation, or system reconnaissance **without requiring a human preference or architectural choice**. Triggers reconnaissance; the agent inspects and records the result. Examples: Go version, existing schema, installed dependency version, current module path.
+- `[UNKNOWN:DECIDE]` — The unknown **cannot be resolved by factual reconnaissance** because it represents a human-owned product, architectural, boundary, policy, or other consequential decision. Triggers a human decision request; the agent must **not** silently choose a value to unblock execution. Examples: whether independent repositories must consume shared modules through versioned modules or a monorepo; whether authentication is mandatory for the first milestone.
 - `[CONFLICT]` — Contradictory evidence between prompt and repository. Requires reconciliation before proceeding.
+
+> **Classification Rule**: Can evidence or reconnaissance establish the answer?
+> - **Yes** → `[UNKNOWN:INSPECT]`
+> - **No** + requires a human-owned consequential choice → `[UNKNOWN:DECIDE]`
+>
+> Do NOT classify every architecture question as `[UNKNOWN:DECIDE]`. The criterion is decision ownership and resolvability, not terminology.
 
 > **Testing / Example Rule**: For hypothetical benchmarks or example scenarios, never use `[OBSERVED]`. Use `[FIXTURE]` or `[EXAMPLE CONTEXT]` instead.
 
@@ -222,9 +229,9 @@ The presence of a domain keyword alone does not determine risk level. Do **NOT**
 
 | Risk Level | Operational Criteria | Review Policy | Downstream Action |
 | :--- | :--- | :--- | :--- |
-| **LOW** | Localized, easily reversible, zero blast radius outside single file, 0 material ambiguities. | `NONE` | Agent may proceed directly to execution. |
-| **MEDIUM** | Crosses module boundaries, internal API extensions, manageable unknowns without high consequence. | `RECOMMENDED` | Brief presented to user; proceed unless corrected. |
-| **HIGH** | High operational consequence (e.g. data integrity impact, authorization semantics changes, financial/ledger mutations, destructive operations, irreversible schema changes), or **any unresolved Material Ambiguity**. | `MANDATORY` | **Hard block.** Execution prohibited until human explicitly clears the brief. |
+| **LOW** | Localized, easily reversible, zero blast radius outside single file, 0 material ambiguities. | `NONE` | Agent may proceed directly to execution. Emit `READY`. |
+| **MEDIUM** | Crosses module boundaries, internal API extensions, manageable unknowns without high consequence. | `RECOMMENDED` | Brief presented to user; proceed unless corrected. Emit `READY`. |
+| **HIGH** | High operational consequence (e.g. data integrity impact, authorization semantics changes, financial/ledger mutations, destructive operations, irreversible schema changes), or **any unresolved Material Ambiguity**. | `MANDATORY` | **Hard block.** Emit `READY_PENDING_APPROVAL`. Execution prohibited until human explicitly clears the brief and status transitions to `READY`. |
 
 ---
 
@@ -289,12 +296,12 @@ Wizard must never usurp downstream Craftsman skills:
 
 In v0.1, Wizard operates under **Model A (Instructional Reconnaissance)**:
 1. Wizard inspects context and repository evidence available at intake.
-2. Missing repository facts are tagged `[UNKNOWN]`.
-3. **Reconnaissance Directive Rule**: Every *material* `[UNKNOWN]` required for the selected contract or verification obligations must become a reconnaissance directive. Irrelevant unknowns do not need to be surfaced merely because they are unknown.
-4. The downstream executing agent runs the reconnaissance (using read-only tools or terminal inspection) before editing code.
-5. Discovered facts satisfy conditional skill triggers or resolve unknowns.
+2. Missing facts are classified as either `[UNKNOWN:INSPECT]` or `[UNKNOWN:DECIDE]` (see §5).
+3. **Reconnaissance Directive Rule**: Every material `[UNKNOWN:INSPECT]` required for the selected contract or verification obligations becomes a reconnaissance directive. The downstream agent inspects and records the result before editing code.
+4. **Human Decision Rule**: Every material `[UNKNOWN:DECIDE]` required for the contract must be surfaced for human resolution. Reconnaissance alone cannot resolve it. The agent must NOT silently choose a value.
+5. Discovered `[UNKNOWN:INSPECT]` facts satisfy conditional skill triggers and resolve their unknowns. Resolved `[UNKNOWN:DECIDE]` values are recorded as human-supplied; no additional silent assumptions are inferred from them.
 
-Wizard identifies what must be learned; downstream agent performs read-only reconnaissance; only then does implementation begin. Wizard does not build or require a separate autonomous reconnaissance runtime and must never invent repository facts.
+Wizard identifies what must be learned or decided; it does not build or require a separate autonomous reconnaissance runtime and must never invent repository facts or human architectural choices.
 
 ---
 
@@ -304,7 +311,7 @@ A Wizard invocation produces an **Execution Brief** or equivalent bounded contra
 1. **Intent status** (epistemic state of interpretation)
 2. **Scope** (in-scope targets and out-of-scope non-goals)
 3. **Material ambiguities** (blocking architectural forks, or none)
-4. **Evidence & relevant UNKNOWNs** (established facts and material reconnaissance directives)
+4. **Evidence & UNKNOWNs** (established facts, `[UNKNOWN:INSPECT]` reconnaissance directives, `[UNKNOWN:DECIDE]` human decision requests)
 5. **Skill routing** (selected disciplines with boundary ownership justifications)
 6. **Risk and review policy** (consequence-derived tier and approval requirement)
 7. **Verification obligations** (observable boundary checks, falsification, and regression guards)
@@ -318,7 +325,7 @@ The output must be **concise and operational**. Do not require a fixed verbose t
 ================================================================================
 CRAFTSMAN EXECUTION BRIEF: [Task Name]
 ================================================================================
-STATUS:         [ READY | AWAITING_CLARIFICATION | REPLAN_REQUIRED ]
+STATUS:         [ READY | READY_PENDING_APPROVAL | AWAITING_CLARIFICATION | REPLAN_REQUIRED ]
 RISK LEVEL:     [ LOW | MEDIUM | HIGH ]
 REVIEW POLICY:  [ NONE | RECOMMENDED | MANDATORY ]
 FIRST SENTENCE: [What will change, and what major systems will remain untouched]
@@ -343,8 +350,10 @@ FIRST SENTENCE: [What will change, and what major systems will remain untouched]
 4. EVIDENCE & RECONNAISSANCE:
    - Established Facts:
      * [OBSERVED / PROVEN] [Fact statement]
-   - Material Reconnaissance Directives:
-     * [UNKNOWN] [Missing material fact] --> Inspect: [Target path/command]
+   - Reconnaissance Directives:
+     * [UNKNOWN:INSPECT] [Missing fact] --> Inspect: [Target path/command]
+   - Human Decision Required:
+     * [UNKNOWN:DECIDE] [Decision question] --> Options: [A / B / C]
 
 5. VERIFICATION OBLIGATIONS:
    - Boundary Check:   [Observable behavior verification]
@@ -360,18 +369,44 @@ FIRST SENTENCE: [What will change, and what major systems will remain untouched]
 
 ## 13. Status Semantics
 
-Wizard explicitly distinguishes epistemic status from workflow disposition:
+Wizard explicitly distinguishes epistemic status from workflow disposition.
 
-- **`intent.status` (Epistemic State)**: Describes the certainty of intent interpretation:
-  - `KNOWN`: Prompt is bounded, specific, and unambiguous.
-  - `SUPPORTED`: Non-material interpretation supported by prompt context and repository evidence, while subject to correction.
-  - `AWAITING_CLARIFICATION`: Material ambiguity exists; intent cannot be safely established.
-- **Top-Level `status` (Workflow Disposition)**: Describes the execution state of the contract:
-  - `READY`: Contract is fully bounded and cleared for execution (or awaiting human approval if High Risk).
-  - `AWAITING_CLARIFICATION`: Execution is blocked pending resolution of material ambiguities.
-  - `REPLAN_REQUIRED`: Conceptual v0.1 disposition indicating downstream boundary conflict requiring recompilation.
+### `intent.status` (Epistemic State)
+Describes the certainty of intent interpretation:
+- `KNOWN`: Prompt is bounded, specific, and unambiguous.
+- `SUPPORTED`: Non-material interpretation supported by prompt context and repository evidence, while subject to correction.
+- `AWAITING_CLARIFICATION`: Material ambiguity exists; intent cannot be safely established.
+
+### Top-Level `status` (Workflow Disposition)
+Answers: *"Can execution begin right now?"*
+
+| Status | Meaning | Execution Permitted? |
+| :--- | :--- | :--- |
+| `READY` | Planning complete. No blocking human decision remains. | **Yes** |
+| `READY_PENDING_APPROVAL` | Planning complete. Required human approval not yet granted. | **No** |
+| `AWAITING_CLARIFICATION` | A material requirement or ambiguity is insufficiently specified. Contract cannot yet be compiled into an executable plan. | **No** |
+| `REPLAN_REQUIRED` | A previously accepted contract has encountered a new boundary, constraint, or decision that invalidates the current execution plan. | **No** — recompile first |
 
 These fields answer different questions and are not redundant.
+
+### Approval Lifecycle
+
+```text
+READY_PENDING_APPROVAL
+        │
+        ├── human explicitly approves ──────────────► READY → Execution permitted
+        │
+        └── human rejects or changes a decision ────► REPLAN_REQUIRED
+```
+
+> **Approval invariant**: Human approval authorizes execution of the already-bounded contract. It does **not** automatically resolve unresolved architectural decisions, expand scope, or silently change the plan. If approval changes a specific decision (e.g. "use approach B"), that decision must be recorded separately as resolved before the contract progresses to `READY`.
+
+### When to Use Each Status
+
+- Emit `READY` when the contract is complete, risk is LOW/MEDIUM, and execution is authorized without further human clearance.
+- Emit `READY_PENDING_APPROVAL` when planning is complete, but an unresolved `[UNKNOWN:DECIDE]` is material to the contract, or risk is HIGH and mandatory review has not yet been granted.
+- Emit `AWAITING_CLARIFICATION` when a material ambiguity prevents the contract from being compiled (e.g. the architectural fork cannot be described without a human-supplied scope decision).
+- Set `REPLAN_REQUIRED` when a previously accepted contract is invalidated by a newly discovered boundary or constraint.
 
 ---
 
@@ -397,9 +432,12 @@ The agent must:
 - **Keyword Pavlovism**: Selecting `database-craftsman` because the word "data" appeared in prompt, even though the task is updating a UI label.
 - **Kitchen-Sink Hoarding**: Selecting 8+ skills "just to be safe". Violates the Boundary Ownership Rule.
 - **Assumption Compilation**: Compiling an underspecified request with silent architectural assumptions instead of flagging Material Ambiguity.
+- **Silent DECIDE Resolution**: Treating an `[UNKNOWN:DECIDE]` as an `[UNKNOWN:INSPECT]` and silently choosing a value (e.g. a repository distribution model, a product boundary, or a mandatory auth policy) to unblock execution without surfacing it to the human.
+- **DECIDE Inflation**: Classifying every architecture question as `[UNKNOWN:DECIDE]` to avoid making any judgment, when the answer is actually derivable from repository inspection. The criterion is decision ownership, not terminology.
 - **Execution Usurpation**: Wizard writing code diffs, planning line-by-line milestones, or running implementation tasks.
 - **Fake Observations**: Using `[OBSERVED]` for hypothetical benchmark scenarios instead of `[FIXTURE]`.
 - **Exclusion Vomiting**: Listing 12 obviously irrelevant skills in human-facing briefs. Only show meaningful, non-obvious exclusions.
+
 
 ---
 
@@ -408,10 +446,13 @@ The agent must:
 Before releasing the Execution Brief:
 - [ ] First sentence explicitly states what changes and what stays untouched.
 - [ ] Every selected skill has a non-overlapping boundary ownership justification.
-- [ ] All missing material repository facts are classified `[UNKNOWN]` with inspection directives.
+- [ ] All missing material facts are classified `[UNKNOWN:INSPECT]` (with inspection directives) or `[UNKNOWN:DECIDE]` (with human decision request), not bare `[UNKNOWN]`.
 - [ ] Any material ambiguity blocks architectural commitment (`status: AWAITING_CLARIFICATION`).
+- [ ] Any material `[UNKNOWN:DECIDE]` results in `READY_PENDING_APPROVAL`, not `READY`.
+- [ ] HIGH risk tasks emit `READY_PENDING_APPROVAL`; execution only after explicit human clearance transitions status to `READY`.
 - [ ] Risk level is derived from operational consequence and blast radius, not lexical keywords.
 - [ ] No implementation code diffs or detailed milestone loops are generated by Wizard.
+
 
 ---
 
