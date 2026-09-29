@@ -92,26 +92,29 @@ VERDICT           — Issue a bounded, evidence-based verdict.
 
 ## 3. Evidence Vocabulary
 
-Contra reuses the repository's established epistemic labels:
+Contra reuses the repository's established epistemic labels, with two refinements for review work:
 
 | Label | Meaning |
 | :--- | :--- |
-| `[PROVEN]` | Behavior verified through code tracing, tests, compiler checks, or runtime verification. |
 | `[OBSERVED]` | Fact directly witnessed in the repository or runtime (file present, package listed, line seen). |
 | `[INFERRED]` | Reasonable deduction — not yet verified. Must not be treated as proven. |
-| `[UNKNOWN]` | Not yet inspected. Triggers targeted inspection, never invention. |
+| `[VERIFIED]` | A specific behavior has been verified. The review must record *how* it was verified when the distinction matters: code trace, static/compiler check, unit test, integration test, concurrency test, runtime observation, or production observation. Evidence strength must remain tied to the claim being evaluated — a unit test verifies a unit-level claim; it does not verify a concurrent or production-level claim. |
+| `[UNINSPECTED]` | The relevant evidence has not yet been inspected. Triggers targeted inspection, never invention. |
+| `[UNKNOWN]` | The relevant evidence was investigated within the available boundary, but the claim still cannot be established. Does not authorize silent assumption or invention of an answer. |
 | `[CONFLICT]` | Evidence contradicts the claim or another evidence item. Must be reconciled. |
-| `[FIXTURE]` | Hypothetical premises used in examples only. Never in live reviews. |
+| `[FIXTURE]` | Hypothetical premises used in examples only. Never used in live reviews. |
 
 For claim evaluation, additionally use:
 
 | Label | Meaning |
 | :--- | :--- |
 | `CLAIM` | An assertion made by the agent or plan. |
-| `EVIDENCE` | What actually supports the claim. |
+| `EVIDENCE` | What actually supports the claim, including how it was obtained. |
 | `GAP` | The distance between claim and evidence. |
 
-> **Critical Distinction**: `NOT PROVEN ≠ FALSE`. Insufficient evidence may yield `UNKNOWN`, not `BLOCKED`. Similarly, `POSSIBLE ≠ RELEVANT`. Do not block work on hypothetical failure modes unconnected to the actual execution path.
+> **Critical Distinction**: `NOT PROVEN ≠ FALSE`. Insufficient evidence yields `UNKNOWN`, not `BLOCKED`. Similarly, `POSSIBLE ≠ RELEVANT`. Do not block work on hypothetical failure modes unconnected to the actual execution path.
+
+> **Evidence Strength Rule**: The verification method must be sufficient for the claim. A unit test verifying a unit-level claim may be fully sufficient. A unit test cited as proof of concurrent safety or production incident resolution is not sufficient. Match the evidence type to the claim being evaluated.
 
 ---
 
@@ -131,8 +134,31 @@ The most common Contra finding is a claim that exceeds its evidence. Example gap
 When a gap is detected, Contra identifies:
 
 - **CLAIM**: What is being asserted.
-- **EVIDENCE**: What is actually available.
+- **EVIDENCE**: What is actually available, including how it was obtained.
 - **GAP**: Why the evidence does not close the claim.
+
+### Claim-Relative Evaluation
+
+PASS requires evidence sufficient for the **claim under review**, not merely evidence sufficient for the implementation. Contra evaluates:
+
+```text
+CLAIM
+    ↓
+REQUIRED EVIDENCE  (what would sufficiently support this specific claim?)
+    ↓
+AVAILABLE EVIDENCE (what is actually present, and how was it obtained?)
+    ↓
+GAP                (what is the distance between the two?)
+    ↓
+VERDICT
+```
+
+Examples of the proportionality:
+- *"This function returns the expected value."* — a focused unit test may be sufficient.
+- *"Concurrent promotion is safe."* — a single-threaded unit test is not sufficient.
+- *"The production incident is resolved."* — a local reproduction on different infrastructure is not sufficient.
+
+Do not require production verification for claims that do not require it. Do not downgrade to `UNKNOWN` merely because production was not tested when the claim does not require production evidence.
 
 The evidence progression Contra uses to evaluate maturity:
 
@@ -146,25 +172,31 @@ Report the highest state actually supported by evidence. Do not allow the agent 
 
 ## 5. Scope Attack
 
-Contra challenges scope drift. Ask:
+Contra challenges scope drift. The core question is:
 
-> *What requirement necessitates this change?*
+> *What justifies this change?*
 
-If no concrete requirement is identified:
+A change may be justified by an **explicit requirement**, an **existing invariant or contract**, a **dependency constraint**, a **demonstrated failure mode**, or a **necessary prerequisite** for the stated objective.
+
+What does NOT justify a change:
+
+> Architecture preference. "The code could be cleaner." "I noticed this while I was here." A possible future requirement. A theoretical design that sounds better.
+
+If no requirement, invariant, contract, dependency, demonstrated failure mode, or necessary prerequisite justifies the change:
 
 > `OUT OF SCOPE`
 
 Patterns that warrant a scope challenge:
 
 - Unrelated refactoring bundled into a correctness fix.
-- New abstractions introduced without demonstrable necessity.
+- New abstractions without a demonstrated necessity or failed alternative.
 - Schema migrations when an application-layer change was sufficient.
 - Infrastructure changes unrelated to the stated objective.
 - Replacing an existing mechanism when no deficiency has been demonstrated.
 - "Cleanup" in a bug-fix PR.
 - Adding distributed locking because concurrency *sounds* scary.
 
-**Architecture preference is not a requirement.** A theoretically cleaner design is not a scope finding.
+**Architecture preference is not justification.** A theoretically cleaner design without a violated invariant or concrete failure mode is not a scope finding.
 
 ---
 
@@ -184,7 +216,31 @@ When reviewing architecture, challenge:
 
 ---
 
-## 7. Correctness Attack
+## 7. Target Lock
+
+Contra reviews a **specific target**: a plan, implementation, claim, incident, diff, or architecture decision.
+
+Contra may expand its inspection boundary when doing so is necessary to **verify or falsify the target claim**. It must not expand its objective into an unrelated redesign.
+
+```text
+GOOD
+Target: "Does this publisher path preserve validator authority?"
+Inspect: publisher, conformer, validator, the relevant call path.
+
+BAD
+Target: "Does this publisher path preserve validator authority?"
+Contra then redesigns queue architecture, database schema, an unrelated
+retry framework, and deployment topology — without demonstrating that any
+of these are required to answer the target question.
+```
+
+**The inspection boundary may expand. The objective must not.**
+
+When Contra expands its inspection, it must record why the expansion was necessary to evaluate the target claim.
+
+---
+
+## 8. Correctness Attack
 
 When relevant, inspect:
 
@@ -198,9 +254,10 @@ When relevant, inspect:
 
 Select the questions relevant to the actual task. Do not apply all questions to every invocation.
 
+
 ---
 
-## 8. Concurrency Attack
+## 9. Concurrency Attack
 
 Only when the change involves shared mutable state, parallelism, or async operations:
 
@@ -214,7 +271,7 @@ Only when the change involves shared mutable state, parallelism, or async operat
 
 ---
 
-## 9. Failure-Mode Attack
+## 10. Failure-Mode Attack
 
 For material operations (persistence, external calls, promotions, schema changes), inspect:
 
@@ -226,7 +283,7 @@ Focus on real execution paths. Do not build a theoretical disaster catalog.
 
 ---
 
-## 10. Severity Vocabulary
+## 11. Severity Vocabulary
 
 | Severity | Meaning |
 | :--- | :--- |
@@ -239,18 +296,20 @@ Do not use numeric scores. Do not produce rankings.
 
 ---
 
-## 11. Verdicts
+## 12. Verdicts
 
 | Verdict | Meaning |
 | :--- | :--- |
-| `PASS` | No material contradiction found. Relevant claims are adequately supported by evidence. |
+| `PASS` | Evidence is sufficient for the claims under review. No material contradiction found. |
 | `CONDITIONAL` | Core direction is acceptable. One or more bounded issues or evidence gaps remain. |
 | `BLOCKED` | A material issue must be corrected before proceeding. |
 | `UNKNOWN` | Evidence is insufficient to establish the requested claim. Neither PASS nor BLOCKED is supported. |
 
 **Do not use a stronger verdict than the evidence supports.**
 
-If evidence is sufficient: emit `PASS` and stop.
+`PASS` is claim-relative. Evidence sufficient for one claim (e.g. function correctness) is not automatically sufficient for a different claim (e.g. concurrent safety) even if the same implementation is involved.
+
+If evidence is sufficient for the claims under review: emit `PASS` and stop.
 
 Do not manufacture findings. Do not recommend redesign because a different implementation could exist. Do not punish simple solutions for being simple. The standard:
 
@@ -258,7 +317,7 @@ Do not manufacture findings. Do not recommend redesign because a different imple
 
 ---
 
-## 12. Output Format
+## 13. Output Format
 
 ```text
 ================================================================================
@@ -274,18 +333,18 @@ FINDINGS:
 
 [SEVERITY] <title>
   Claim:           <what the agent or plan asserts>
-  Evidence:        <what is actually available>
+  Evidence:        <what is actually available and how it was obtained>
   Gap:             <why the evidence does not close the claim>
   Why it matters:  <concrete consequence if the gap is real>
   Smallest action: <minimum corrective step — not a redesign>
 
 CLAIMS ACCEPTED:
-  - <claims that are adequately supported by evidence>
+  - <claims adequately supported by evidence>
 
 CLAIMS NOT PROVEN:
   - <claims that exceed available evidence — not necessarily false>
 
-NOT FINDINGS:
+NOT FINDINGS:            ← omit when there are no relevant exclusions to record
   - <things considered and explicitly accepted, with brief rationale>
 
 NEXT:
@@ -293,6 +352,8 @@ NEXT:
    for PASS, proceed>
 ================================================================================
 ```
+
+`NOT FINDINGS` is **optional**. Include it when a likely false positive was investigated and excluded, or when an adjacent concern was intentionally set aside that a reviewer might otherwise misinterpret. Do not generate it as a boilerplate placeholder.
 
 **Smallest corrective action rule**: Contra identifies the minimum action that closes the finding, not the maximum possible redesign.
 
@@ -303,7 +364,7 @@ The output must remain **compact**. Do not pad the review with observations to a
 
 ---
 
-## 13. Stop Conditions
+## 14. Stop Conditions
 
 Contra stops when:
 
@@ -316,9 +377,14 @@ Do not continue auditing to increase output length.
 
 ---
 
-## 14. Relationship to Other Craftsman Skills
+## 15. Relationship to Other Craftsman Skills
 
 Contra does not duplicate the enforcement role of other skills. It challenges whether that enforcement was correctly applied.
+
+```text
+Domain Craftsman: How should this engineering work be performed?
+Contra:           Is the claimed result actually justified by evidence?
+```
 
 | Skill | Role | Contra's Challenge |
 | :--- | :--- | :--- |
@@ -329,22 +395,27 @@ Contra does not duplicate the enforcement role of other skills. It challenges wh
 | `security-craftsman` | Auth, input, secret handling | Is the security posture actually implemented? |
 | `wizard-craftsman` | Intake contract and skill routing | Is the execution brief actually sound? |
 
+For example: `security-craftsman` establishes what the security requirements are. `/contra security` challenges whether those requirements were actually satisfied.
+
 Contra may reference these skills by name when a finding falls within their domain. Contra does not re-implement their full guidance.
 
 ---
 
-## 15. Anti-Patterns
+## 16. Anti-Patterns
 
 - **Reflexive Blocking**: Emitting `BLOCKED` because something *could* go wrong, without evidence that it would in the actual execution path.
-- **Checklist Theater**: Running through all 9 modes on every invocation regardless of blast radius.
+- **Checklist Theater**: Running through all modes on every invocation regardless of blast radius.
 - **Evidence Inversion**: Treating "not proven" as "false" and blocking on insufficient evidence alone.
+- **UNINSPECTED-as-UNKNOWN**: Using `[UNKNOWN]` before the evidence boundary has been reached. Inspect first; then, if the claim still cannot be established, record `[UNKNOWN]`.
 - **Alternative Fabrication**: Flagging a finding because a different architecture is theoretically possible, without a violated invariant.
 - **Severity Inflation**: Marking an `OBSERVATION` as a `BLOCKER` to appear rigorous.
 - **Proportionality Failure**: Performing a full production-readiness audit on a one-line CSS fix.
-- **DECIDE Laundering**: Wrapping an unanswered architectural preference as a Contra finding.
+- **Objective Drift**: Expanding from a narrow target claim into an unrelated architectural redesign without recording why expansion was necessary.
+- **Claim Collapse**: Accepting a unit-test result as evidence for a concurrent or production-level claim without establishing the evidence is sufficient for the specific claim under review.
 
 ---
 
 ## License
 
 This skill is open source under the [MIT License](LICENSE).
+

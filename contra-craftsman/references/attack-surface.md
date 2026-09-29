@@ -22,14 +22,14 @@ Do not apply all domains to every review.
 **Trigger**: Any review. Scope drift is always checked.
 
 Ask:
-- Does every change in the diff trace back to a stated requirement?
-- Is any change present that was not requested and not a necessary prerequisite?
+- Does every change trace back to a requirement, invariant, contract, demonstrated failure mode, or necessary prerequisite?
+- Is any change present that is justified only by architecture preference or "I noticed this while I was here"?
 - Is "cleanup" bundled with a correctness fix?
-- Is there a new abstraction with no demonstrated necessity?
+- Is there a new abstraction with no demonstrated necessity or failed alternative?
 - Is there a schema migration when application-layer state was sufficient?
 
-Standard response to unjustified change:
-> *What requirement necessitates this change? If none exists: OUT OF SCOPE.*
+Standard: a change may be justified by an explicit requirement, an existing invariant, a dependency constraint, a demonstrated failure mode, or a necessary prerequisite. Architecture preference alone is not justification. If no concrete justification exists:
+> *OUT OF SCOPE.*
 
 ---
 

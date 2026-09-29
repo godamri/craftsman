@@ -2,7 +2,7 @@
 
 Five reference scenarios demonstrating Contra's review behavior.
 
-> **Epistemic Standard**: Repository premises in these examples are marked `[FIXTURE]`. The label `[OBSERVED]` is reserved for live workspace inspections.
+> **Epistemic Standard**: Repository premises in these examples are marked `[FIXTURE]`. The label `[OBSERVED]` is reserved for live workspace inspections. `[UNINSPECTED]` means evidence not yet inspected — triggers inspection. `[UNKNOWN]` means evidence was investigated within the available boundary but the claim cannot be established — does not authorize invention.
 
 ---
 
@@ -29,7 +29,8 @@ CLAIMS ACCEPTED:
 NOT FINDINGS:
   - Theming system absence: not required for a single styling fix.
   - Accessibility contrast: not in scope unless the new color was specified
-    without a contrast check. [UNKNOWN] — trivially verifiable by inspection.
+    without a contrast check. [UNINSPECTED] — trivially verifiable by inspection
+    if the color is being changed to a new value.
 
 NEXT: Proceed.
 ```
@@ -145,16 +146,17 @@ FINDINGS:
   Claim:          "Deterministic naming prevents duplicate uploads."
   Evidence:       [FIXTURE] SHA-256 key is deterministic per content.
                   [FIXTURE] Existence check runs before write.
-                  [UNKNOWN] Whether the storage backend's write is conditional
-                            (e.g. PUT-if-absent) or unconditional.
+                  [UNINSPECTED] Whether the storage backend's write is conditional
+                                (e.g. PUT-if-absent) or unconditional — not yet
+                                inspected in the storage client configuration.
   Gap:            Two concurrent uploads of the same content can both pass the
                   existence check before either write completes.
                   Deterministic naming reduces the problem to one key, but
                   does not make the check-then-write atomic.
   Why it matters: Depending on the storage backend, this may result in a
                   redundant write (benign) or a partial overwrite (data loss).
-  Smallest action: Determine whether the storage backend supports an atomic
-                   conditional write (e.g. S3 conditional PUT, GCS
+  Smallest action: Inspect the storage client to determine whether it supports
+                   an atomic conditional write (e.g. S3 conditional PUT, GCS
                    x-goog-if-generation-match). If yes, use it — no lock needed.
                    If not, characterize the failure mode and decide whether
                    it is acceptable for the use case.
@@ -164,9 +166,9 @@ CLAIMS ACCEPTED:
   - Single-writer path is correct.
 
 CLAIMS NOT PROVEN:
-  - Concurrent deduplication safety — depends on storage atomicity.
+  - Concurrent deduplication safety — depends on storage write atomicity.
 
-NEXT: Verify storage backend's write semantics. If conditional write is
+NEXT: Inspect storage client implementation. If conditional write is
       available, use it and re-invoke /contra to confirm.
 ```
 
