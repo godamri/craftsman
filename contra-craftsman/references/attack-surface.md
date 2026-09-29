@@ -155,6 +155,7 @@ and PRODUCTION VERIFIED. Do not allow these to collapse into a single claim.
 
 ## Stop Condition Reminder
 
-When the relevant attack surface has been covered with no material finding: **PASS**.
+When the relevant attack surface has been covered and evidence is sufficient for the claims under review with no material contradiction: **PASS**.
 
 Do not continue auditing to appear thorough.
+
