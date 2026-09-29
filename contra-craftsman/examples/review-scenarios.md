@@ -28,9 +28,8 @@ CLAIMS ACCEPTED:
 
 NOT FINDINGS:
   - Theming system absence: not required for a single styling fix.
-  - Accessibility contrast: not in scope unless the new color was specified
-    without a contrast check. [UNINSPECTED] — trivially verifiable by inspection
-    if the color is being changed to a new value.
+  - Accessibility contrast: outside the reviewed claim of a localized styling update;
+    does not constitute a finding against the requested change.
 
 NEXT: Proceed.
 ```
@@ -145,19 +144,19 @@ Verdict: CONDITIONAL
 
 FINDINGS:
 
-[MAJOR] Existence check and write are not atomic
+[MAJOR] Deterministic naming does not establish concurrent deduplication safety
   Claim:          "Deterministic naming prevents duplicate uploads."
   Evidence:       [FIXTURE] SHA-256 key is deterministic per content.
                   [FIXTURE] Existence check runs before write.
                   [UNINSPECTED] Whether the storage backend's write is conditional
                                 (e.g. PUT-if-absent) or unconditional — not yet
                                 inspected in the storage client configuration.
-  Gap:            Two concurrent uploads of the same content can both pass the
-                  existence check before either write completes.
-                  Deterministic naming reduces the problem to one key, but
-                  does not make the check-then-write atomic.
-  Why it matters: Depending on the storage backend, this may result in a
-                  redundant write (benign) or a partial overwrite (data loss).
+  Gap:            Two concurrent callers can both observe absence before either write completes.
+                  Deterministic naming alone does not make the check-and-write sequence atomic;
+                  whether concurrent uploads race safely depends on storage backend write
+                  semantics that remain [UNINSPECTED].
+  Why it matters: Depending on uninspected backend write semantics, this could result in a
+                  redundant write (benign) or an unsafe partial overwrite (data loss).
   Smallest action: Inspect the storage client to determine whether it supports
                    an atomic conditional write (e.g. S3 conditional PUT, GCS
                    x-goog-if-generation-match). If yes, use it — no lock needed.
@@ -198,29 +197,27 @@ FINDINGS:
 
 [MAJOR] Production conditions not reproduced
   Claim:          "The incident is resolved."
-  Evidence:       [FIXTURE] Synthetic reproduction passes on local SQLite,
-                            single thread.
-  Gap:            The production incident occurred under:
-                    - PostgreSQL (not SQLite)
-                    - Concurrent load (not single-threaded)
-                    - Real network latency between service and database
-                  None of these conditions are present in the reproduction.
-  Why it matters: The fix may address the symptom visible in the simplified
-                  reproduction while the root cause in production remains active.
-  Smallest action: Re-run the reproduction against PostgreSQL under concurrent
-                   load matching production conditions. If the fix holds, the
-                   claim advances from UNKNOWN toward VERIFIED.
+  Evidence:       [FIXTURE] Synthetic reproduction passes on local SQLite, single thread.
+                  [FIXTURE] Original incident involved a live database under concurrent load.
+  Gap:            The reproduction differs materially from the stated production conditions:
+                  a live database under concurrent load versus local SQLite with single-threaded
+                  execution. The production conditions are not reproduced in the test environment.
+  Why it matters: The fix may address the symptom visible in the simplified single-threaded
+                  reproduction while the failure mode under live concurrent load remains active.
+  Smallest action: Re-run the reproduction against the live database environment under concurrent
+                   load matching the incident conditions. If the fix holds under those conditions,
+                   the claim advances from UNKNOWN toward VERIFIED.
 
 CLAIMS ACCEPTED:
   - Fix is implemented.
   - Simplified single-threaded reproduction passes.
 
 CLAIMS NOT PROVEN:
-  - "Incident is resolved" — production conditions not matched.
+  - "Incident is resolved" — live concurrent database conditions not matched.
 
 NOT FINDINGS:
-  - SQLite vs PostgreSQL per se: the concern is concurrent load and lock
-    behavior, not the database choice in isolation.
+  - Local test pass: valid as an implementation check, but does not substantiate
+    the operational resolution claim.
 
-NEXT: Reproduce under PostgreSQL + concurrent load. Then re-invoke /contra.
+NEXT: Reproduce under live database conditions with concurrent load. Then re-invoke /contra.
 ```
