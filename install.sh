@@ -34,10 +34,12 @@ Before executing modifications, inspect the applicable skill:
 - **Language Crafts**: .agents/skills/{go,python,react,rust}-craftsman/SKILL.md
 - **Infrastructure & Quality**: .agents/skills/{devops,qa,distributed-systems,business}-craftsman/SKILL.md
 - **Intake & Skill Orchestration**: .agents/skills/wizard-craftsman/SKILL.md (Transforms ambiguous or multi-domain requests into bounded execution contracts)
+- **Adversarial Review** (explicit invocation only — invoke via /contra): .agents/skills/contra-craftsman/SKILL.md (Challenges reasoning, assumptions, scope, and production claims when explicitly requested)
 
 Rules for Agents:
 1. Read the relevant SKILL.md before generating architectural or implementation plans.
-2. Comply with all prohibitions and release gates defined in the referenced skill."
+2. Comply with all prohibitions and release gates defined in the referenced skill.
+3. contra-craftsman is INACTIVE unless explicitly invoked with /contra. Do NOT activate it automatically."
 
 generate_payload() {
   local t="${1:-shared}"

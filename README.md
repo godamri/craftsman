@@ -9,7 +9,7 @@ Practical engineering skills for AI coding agents, focused on evidence, correctn
 
 ## What It Is
 
-Craftsman is a collection of 16 modular engineering skills designed for AI coding agents and human software engineers. Rather than providing application-specific boilerplate or code generators, each skill provides operational engineering discipline—establishing concrete constraints, trade-off models, and verification criteria for distinct domains of software construction and system operations.
+Craftsman is a collection of 17 modular engineering skills designed for AI coding agents and human software engineers. Rather than providing application-specific boilerplate or code generators, each skill provides operational engineering discipline—establishing concrete constraints, trade-off models, and verification criteria for distinct domains of software construction and system operations.
 
 The collection emphasizes:
 - Understanding existing codebases before proposing changes.
@@ -55,6 +55,7 @@ The impact of Craftsman is observed in how an AI agent designs, scopes, and veri
 | :--- | :--- |
 | [architecture-craftsman](architecture-craftsman/) | System boundaries, state ownership, dependency direction, failure domain isolation, and evolutionary architecture. |
 | [business-craftsman](business-craftsman/) | Value validation, portfolio prioritization, capacity allocation, risk containment, and outcome realization. |
+| [contra-craftsman](contra-craftsman/) | Adversarial engineering review: challenges reasoning, assumptions, scope, architecture, invariants, failure modes, and production claims when explicitly invoked via `/contra`. |
 | [database-craftsman](database-craftsman/) | Relational schema integrity, transaction boundaries, concurrency control, safe migrations, and query performance. |
 | [devops-craftsman](devops-craftsman/) | Infrastructure administration, credential security, database operations, failure recovery, and zero-downtime rollouts. |
 | [distributed-systems-craftsman](distributed-systems-craftsman/) | State consistency, idempotency, delivery semantics, fencing tokens, outbox patterns, and resilient recovery. |
@@ -99,7 +100,7 @@ Craftsman skills can be installed into your coding agent's environment or refere
 Install directly using the open agent skills CLI:
 
 ```bash
-# Install all 16 skills to your detected agent environment:
+# Install all 17 skills to your detected agent environment:
 npx skills add godamri/craftsman
 
 # Or install specific skills:
