@@ -101,10 +101,13 @@ FINDINGS:
 [BLOCKER] Three unrelated changes bundled with a one-line bug fix
   Claim:          Diff addresses the nil-pointer dereference.
   Evidence:       [FIXTURE] Nil check fix is present. Three additional changes
-                  are also present with no stated requirement.
+                  are also present with no requirement, invariant, contract,
+                  demonstrated failure mode, or necessary prerequisite to justify them.
   Gap:
-    - EventBus abstraction: no requirement requests decoupling event dispatch.
-    - confirmed_at migration: not required to fix a nil dereference.
+    - EventBus abstraction: no requirement or demonstrated failure in the existing
+      event dispatch mechanism justifies decoupling it now.
+    - confirmed_at migration: not required by the nil dereference fix, nor by
+      any existing contract or invariant.
     - Email logic refactor: email sending worked before; no deficiency demonstrated.
   Why it matters: Each bundled change introduces independent risk and blast radius.
                   A nil-pointer fix should be reviewable in isolation.

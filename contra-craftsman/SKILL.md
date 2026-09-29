@@ -116,6 +116,8 @@ For claim evaluation, additionally use:
 
 > **Evidence Strength Rule**: The verification method must be sufficient for the claim. A unit test verifying a unit-level claim may be fully sufficient. A unit test cited as proof of concurrent safety or production incident resolution is not sufficient. Match the evidence type to the claim being evaluated.
 
+> **UNKNOWN Is Terminal**: When the relevant evidence boundary has been reached and the claim still cannot be established, `UNKNOWN` is a valid final verdict. Contra does not investigate indefinitely to eliminate all uncertainty. If additional evidence would require proportionate effort, it may be recommended as the next action — but Contra stops and issues `UNKNOWN`, it does not loop.
+
 ---
 
 ## 4. Claim vs. Evidence Detection
