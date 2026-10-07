@@ -1,0 +1,128 @@
+{
+  "version": "0.1.0",
+  "id": "how-databases-find-data",
+  "domain": "video",
+  "objective": "A 30-second educational explainer showing how a database finds your data, from request to result.",
+  "description": "Explains the journey of a query using clear visual metaphors: understanding the request, looking inside storage boxes using a book-style index, and returning the answer.",
+  "constraints": {
+    "targetAudience": "Developers, learners, and anyone curious about how databases work",
+    "styleDirection": "dark elegant",
+    "budget": {
+      "maxExecutionSeconds": 90,
+      "allowExternalNetwork": false
+    }
+  },
+  "metadata": {
+    "author": "Technical Educator",
+    "createdAt": "2026-10-02T06:30:00Z",
+    "tags": ["databases", "explainer", "education", "how-it-works"]
+  },
+  "creationInfo": {
+    "toolchain": "remotion-react-ts",
+    "targetArtifactPath": "out/artifact.mp4"
+  },
+  "video": {
+    "format": {
+      "preset": "youtube-landscape",
+      "width": 1920,
+      "height": 1080,
+      "aspectRatio": "16:9",
+      "fps": 30,
+      "durationFrames": 900,
+      "codec": "h264",
+      "container": "mp4"
+    },
+    "theme": {
+      "mode": "dark",
+      "tokens": {
+        "background": "#0B0F19",
+        "surface": "#141D2E",
+        "surfaceBorder": "rgba(255, 255, 255, 0.12)",
+        "text": "#F8FAFC",
+        "textMuted": "#94A3B8",
+        "primary": "#38BDF8",
+        "accent": "#F43F5E"
+      },
+      "typography": {
+        "primaryFont": "Inter",
+        "codeFont": "JetBrains Mono"
+      }
+    },
+    "safeArea": {
+      "profile": "desktop-safe",
+      "insets": {
+        "top": 5,
+        "bottom": 5,
+        "left": 5,
+        "right": 5
+      }
+    },
+    "audio": {
+      "required": true,
+      "type": "background",
+      "codec": "aac",
+      "sampleRate": 48000,
+      "channels": 2,
+      "volume": 0.15,
+      "assetPath": "audio/ambient-bed.mp3"
+    },
+    "scenes": [
+      {
+        "id": "scene_01_user_request",
+        "index": 1,
+        "title": "A User Asks for Data",
+        "durationFrames": 225,
+        "component": "Scene01UserRequest",
+        "narrative": {
+          "headline": "A User Asks for Data",
+          "subheadline": "When you hit submit, a small journey begins before your data comes back."
+        },
+        "transition": { "type": "fade", "durationFrames": 20 }
+      },
+      {
+        "id": "scene_02_database_reads",
+        "index": 2,
+        "title": "The Database Reads the Request",
+        "durationFrames": 225,
+        "component": "Scene02DatabaseReads",
+        "narrative": {
+          "headline": "Understanding What You Asked",
+          "subheadline": "The database first understands what you asked before looking for anything."
+        },
+        "transition": { "type": "slide", "durationFrames": 20 }
+      },
+      {
+        "id": "scene_03_index_lookup",
+        "index": 3,
+        "title": "Looking in Storage Boxes",
+        "durationFrames": 225,
+        "component": "Scene03IndexLookup",
+        "narrative": {
+          "headline": "Checking the Storage Boxes",
+          "subheadline": "Instead of checking every single file, the database uses an index, like an index in a book."
+        },
+        "transition": { "type": "slide", "durationFrames": 20 }
+      },
+      {
+        "id": "scene_04_answer_returns",
+        "index": 4,
+        "title": "The Answer Returns",
+        "durationFrames": 225,
+        "component": "Scene04AnswerReturns",
+        "narrative": {
+          "headline": "The Answer Comes Back",
+          "subheadline": "The database collects only the matching data and sends it straight back to the user."
+        },
+        "transition": { "type": "none", "durationFrames": 0 }
+      }
+    ],
+    "assets": [
+      {
+        "id": "ambient-audio-bed",
+        "type": "audio",
+        "path": "src/assets/audio/ambient-bed.mp3",
+        "required": true
+      }
+    ]
+  }
+}

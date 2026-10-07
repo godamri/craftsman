@@ -1,0 +1,25 @@
+{
+  "manifestVersion": "0.1.0",
+  "generatedAt": "2026-10-02T06:34:00Z",
+  "artifact": {
+    "id": "raft-leader-election",
+    "domain": "video",
+    "primaryBinary": {
+      "path": "out/artifact.mp4",
+      "sha256": "5c4b3a2d1e0f9847291038472910384729103847291038472910384729103847",
+      "fileSizeBytes": 11840120
+    }
+  },
+  "toolchain": {
+    "engine": "remotion",
+    "engineVersion": "4.0.120",
+    "nodeVersion": "v20.12.0",
+    "os": "darwin-arm64"
+  },
+  "validation": {
+    "tier1Status": "PASS",
+    "tier1AudioStatus": "NOT_APPLICABLE",
+    "tier2EvidenceCount": 5,
+    "reportPath": "report/validation-report.md"
+  }
+}

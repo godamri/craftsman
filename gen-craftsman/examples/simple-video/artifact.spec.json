@@ -1,0 +1,108 @@
+{
+  "version": "0.1.0",
+  "id": "hashmap-collision-handling",
+  "domain": "video",
+  "objective": "A 15-second technical explainer demonstrating how hash maps handle key collisions using separate chaining.",
+  "description": "Explains hash collisions, array bucket indexing, and linked list chaining to maintain amortized O(1) lookups.",
+  "constraints": {
+    "targetAudience": "Software engineers and computer science students",
+    "budget": {
+      "maxExecutionSeconds": 60,
+      "allowExternalNetwork": false
+    }
+  },
+  "metadata": {
+    "author": "Technical Creator",
+    "createdAt": "2026-10-02T06:35:00Z",
+    "tags": ["data-structures", "algorithms", "hashmap", "computer-science"]
+  },
+  "creationInfo": {
+    "toolchain": "remotion-react-ts",
+    "targetArtifactPath": "out/artifact.mp4"
+  },
+  "video": {
+    "format": {
+      "preset": "youtube-landscape",
+      "width": 1920,
+      "height": 1080,
+      "aspectRatio": "16:9",
+      "fps": 30,
+      "durationFrames": 450,
+      "codec": "h264",
+      "container": "mp4"
+    },
+    "theme": {
+      "mode": "light",
+      "tokens": {
+        "background": "#F8FAFC",
+        "surface": "#FFFFFF",
+        "surfaceBorder": "#E2E8F0",
+        "text": "#0F172A",
+        "textMuted": "#475569",
+        "primary": "#2563EB",
+        "accent": "#059669"
+      },
+      "typography": {
+        "primaryFont": "Inter",
+        "codeFont": "JetBrains Mono"
+      }
+    },
+    "safeArea": {
+      "profile": "desktop-safe",
+      "insets": {
+        "top": 5,
+        "bottom": 5,
+        "left": 5,
+        "right": 5
+      }
+    },
+    "scenes": [
+      {
+        "id": "scene_01_collision_event",
+        "index": 1,
+        "title": "The Inevitable Collision",
+        "durationFrames": 150,
+        "component": "Scene01CollisionEvent",
+        "narrative": {
+          "headline": "When Two Keys Hash to the Same Array Bucket",
+          "subheadline": "Even with 64-bit hashes, collisions are mathematically inevitable as maps fill."
+        },
+        "transition": {
+          "type": "fade",
+          "durationFrames": 15
+        }
+      },
+      {
+        "id": "scene_02_separate_chaining",
+        "index": 2,
+        "title": "Separate Chaining",
+        "durationFrames": 150,
+        "component": "Scene02SeparateChaining",
+        "narrative": {
+          "headline": "Separate Chaining Appends a Linked Node",
+          "subheadline": "The array slot stores a pointer to a linked list of colliding key-value pairs."
+        },
+        "transition": {
+          "type": "slide",
+          "durationFrames": 15
+        }
+      },
+      {
+        "id": "scene_03_amortized_constant_time",
+        "index": 3,
+        "title": "Amortized O(1) Lookup",
+        "durationFrames": 150,
+        "component": "Scene03AmortizedConstantTime",
+        "narrative": {
+          "headline": "Maintaining O(1) Amortized Average Access",
+          "subheadline": "Dynamic array resizing keeps bucket chains short and lookups instant."
+        },
+        "transition": {
+          "type": "none",
+          "durationFrames": 0
+        }
+      }
+    ],
+    "assets": []
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "manifestVersion": "0.1.0",
+  "generatedAt": "2026-10-02T06:32:00Z",
+  "artifact": {
+    "id": "how-databases-find-data",
+    "domain": "video",
+    "primaryBinary": {
+      "path": "out/artifact.mp4",
+      "sha256": "3a8c78a0f90e9e4f3a7f80dbca45c43d9283f5cba2837493a748293748293748",
+      "fileSizeBytes": 14782910,
+      "audio": {
+        "present": true,
+        "codec": "aac",
+        "sampleRate": 48000,
+        "channels": 2,
+        "durationSeconds": 30.02
+      }
+    }
+  },
+  "toolchain": {
+    "engine": "remotion",
+    "engineVersion": "4.0.120",
+    "nodeVersion": "v20.12.0",
+    "os": "darwin-arm64"
+  },
+  "validation": {
+    "tier1Status": "PASS",
+    "tier1AudioStatus": "PASS",
+    "tier2EvidenceCount": 5,
+    "reportPath": "report/validation-report.md"
+  }
+}

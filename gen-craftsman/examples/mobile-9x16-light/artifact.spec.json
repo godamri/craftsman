@@ -1,0 +1,99 @@
+{
+  "version": "0.1.0",
+  "id": "concurrent-race-conditions",
+  "domain": "video",
+  "objective": "A 15-second vertical mobile explainer demonstrating why concurrent financial transactions lose money without database row locks.",
+  "description": "Shorts/TikTok vertical video explaining the classic lost update race condition and how SELECT FOR UPDATE serializes operations.",
+  "constraints": {
+    "targetAudience": "Frontend and backend developers building web applications",
+    "budget": {
+      "maxExecutionSeconds": 60,
+      "allowExternalNetwork": false
+    }
+  },
+  "metadata": {
+    "author": "Technical Creator",
+    "createdAt": "2026-10-02T06:33:00Z",
+    "tags": ["concurrency", "databases", "race-conditions", "sql", "shorts"]
+  },
+  "creationInfo": {
+    "toolchain": "remotion-react-ts",
+    "targetArtifactPath": "out/artifact.mp4"
+  },
+  "video": {
+    "format": {
+      "preset": "mobile-social",
+      "width": 1080,
+      "height": 1920,
+      "aspectRatio": "9:16",
+      "fps": 30,
+      "durationFrames": 450,
+      "codec": "h264",
+      "container": "mp4"
+    },
+    "theme": {
+      "mode": "light",
+      "tokens": {
+        "background": "#F8FAFC",
+        "surface": "#FFFFFF",
+        "surfaceBorder": "#E2E8F0",
+        "text": "#0F172A",
+        "textMuted": "#64748B",
+        "primary": "#0284C7",
+        "accent": "#E11D48"
+      },
+      "typography": {
+        "primaryFont": "Inter",
+        "codeFont": "JetBrains Mono"
+      }
+    },
+    "safeArea": {
+      "profile": "mobile-social-safe",
+      "insets": {
+        "top": 15,
+        "bottom": 20,
+        "left": 6,
+        "right": 6
+      }
+    },
+    "scenes": [
+      {
+        "id": "scene_01_concurrent_reads",
+        "index": 1,
+        "title": "Simultaneous Requests",
+        "durationFrames": 150,
+        "component": "Scene01ConcurrentReads",
+        "narrative": {
+          "headline": "Two Users Click 'Withdraw' at the Exact Same Millisecond",
+          "subheadline": "Both requests read balance = $100 before either has time to write the deduction."
+        },
+        "transition": { "type": "fade", "durationFrames": 12 }
+      },
+      {
+        "id": "scene_02_lost_update",
+        "index": 2,
+        "title": "The Lost Update",
+        "durationFrames": 150,
+        "component": "Scene02LostUpdate",
+        "narrative": {
+          "headline": "Both Overwrite the Balance with $0",
+          "subheadline": "The user took $200 from the ATM, but your database only registered a $100 loss."
+        },
+        "transition": { "type": "slide", "durationFrames": 12 }
+      },
+      {
+        "id": "scene_03_row_lock_fix",
+        "index": 3,
+        "title": "The Row Lock Solution",
+        "durationFrames": 150,
+        "component": "Scene03RowLockFix",
+        "narrative": {
+          "headline": "Row-Level Locking Queues the Transactions",
+          "subheadline": "SELECT ... FOR UPDATE forces the second request to wait until the first commits."
+        },
+        "transition": { "type": "none", "durationFrames": 0 }
+      }
+    ],
+    "assets": []
+  }
+}

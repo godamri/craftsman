@@ -1,7 +1,7 @@
 # Craftsman
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Skills: 17](https://img.shields.io/badge/skills-17-blue.svg)](#skills)
+[![Skills: 18](https://img.shields.io/badge/skills-18-blue.svg)](#skills)
 [![skills.sh](https://skills.sh/b/godamri/craftsman)](https://skills.sh/godamri/craftsman)
 
 Practical engineering skills for AI coding agents, focused on evidence, correctness, boundaries, safety, and verification.
@@ -10,7 +10,7 @@ Practical engineering skills for AI coding agents, focused on evidence, correctn
 
 ## What It Is
 
-Craftsman is a collection of 17 modular engineering skills designed for AI coding agents and human software engineers. Rather than providing application-specific boilerplate or code generators, each skill provides operational engineering discipline—establishing concrete constraints, trade-off models, and verification criteria for distinct domains of software construction and system operations.
+Craftsman is a collection of 18 modular engineering skills designed for AI coding agents and human software engineers. Rather than providing application-specific boilerplate or code generators, each skill provides operational engineering discipline—establishing concrete constraints, trade-off models, and verification criteria for distinct domains of software construction and system operations.
 
 The collection emphasizes:
 - Understanding existing codebases before proposing changes.
@@ -62,6 +62,7 @@ The impact of Craftsman is observed in how an AI agent designs, scopes, and veri
 | [distributed-systems-craftsman](distributed-systems-craftsman/) | State consistency, idempotency, delivery semantics, fencing tokens, outbox patterns, and resilient recovery. |
 | [engineering-craftsman](engineering-craftsman/) | Cross-cutting engineering lifecycle discipline: requirements, domain modeling, resilience, security, and release gates. |
 | [execution-craftsman](execution-craftsman/) | Milestone-based engineering execution: tactical execution loops, claim-dependent evidence, falsification, and regression verification. |
+| [gen-craftsman](gen-craftsman/) | Autonomous digital artifact creation: structured planning, deterministic generation, editable source code, educational technical explainer storytelling, and casual publishing captions. |
 | [go-craftsman](go-craftsman/) | Correctness, explicit error propagation, structured concurrency, memory ownership, and test verification in Go (1.22+). |
 | [python-craftsman](python-craftsman/) | Simple sufficient design, explicit failure semantics, data modeling, safe concurrency, and measurable performance in Python (3.12+). |
 | [qa-craftsman](qa-craftsman/) | Risk-based testing strategy, invariant assertions, concurrency verification, failure injection, and deterministic release gates. |
@@ -101,7 +102,7 @@ Craftsman skills can be installed into your coding agent's environment or refere
 Install directly using the open agent skills CLI:
 
 ```bash
-# Install all 17 skills to your detected agent environment:
+# Install all 18 skills to your detected agent environment:
 npx skills add godamri/craftsman
 
 # Or install specific skills:
@@ -175,11 +176,13 @@ Web Interface & Landing Page:
 .
 ├── architecture-craftsman/
 ├── business-craftsman/
+├── contra-craftsman/
 ├── database-craftsman/
 ├── devops-craftsman/
 ├── distributed-systems-craftsman/
 ├── engineering-craftsman/
 ├── execution-craftsman/
+├── gen-craftsman/
 ├── go-craftsman/
 ├── python-craftsman/
 ├── qa-craftsman/
@@ -188,6 +191,7 @@ Web Interface & Landing Page:
 ├── scope-guard-craftsman/
 ├── security-craftsman/
 ├── web-design-craftsman/
+├── wizard-craftsman/
 ├── install.sh
 ├── LICENSE
 └── README.md

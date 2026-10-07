@@ -1,0 +1,3 @@
+what happens when two keys land on the same bucket.
+
+#datastructures #hashmap #computerscience #algorithms #programming

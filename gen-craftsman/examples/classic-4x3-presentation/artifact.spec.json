@@ -1,0 +1,100 @@
+{
+  "version": "0.1.0",
+  "id": "raft-leader-election",
+  "domain": "video",
+  "objective": "A 20-second academic slide-style presentation video formatted in classic 4:3 aspect ratio explaining leader election in the Raft consensus algorithm.",
+  "description": "Explains how randomized election timers prevent split votes in distributed systems and achieve majority quorum consensus.",
+  "constraints": {
+    "targetAudience": "Distributed systems engineers, computer science students, and architects",
+    "budget": {
+      "maxExecutionSeconds": 60,
+      "allowExternalNetwork": false
+    }
+  },
+  "metadata": {
+    "author": "Technical Creator",
+    "createdAt": "2026-10-02T06:34:00Z",
+    "tags": ["distributed-systems", "raft", "consensus", "algorithms", "presentation"]
+  },
+  "creationInfo": {
+    "toolchain": "remotion-react-ts",
+    "targetArtifactPath": "out/artifact.mp4"
+  },
+  "video": {
+    "format": {
+      "preset": "classic",
+      "width": 1440,
+      "height": 1080,
+      "aspectRatio": "4:3",
+      "fps": 30,
+      "durationFrames": 600,
+      "codec": "h264",
+      "container": "mp4"
+    },
+    "theme": {
+      "mode": "custom",
+      "tokens": {
+        "background": "#FDFBF7",
+        "surface": "#F4EFE6",
+        "surfaceBorder": "#E6DEC8",
+        "text": "#2C2A29",
+        "textMuted": "#6E6A67",
+        "primary": "#8C3B24",
+        "accent": "#B85D36"
+      },
+      "typography": {
+        "primaryFont": "Georgia",
+        "secondaryFont": "Inter",
+        "codeFont": "JetBrains Mono"
+      }
+    },
+    "safeArea": {
+      "profile": "desktop-safe",
+      "insets": {
+        "top": 5,
+        "bottom": 5,
+        "left": 5,
+        "right": 5
+      }
+    },
+    "scenes": [
+      {
+        "id": "scene_01_split_brain",
+        "index": 1,
+        "title": "The Distributed Challenge",
+        "durationFrames": 200,
+        "component": "Scene01SplitBrain",
+        "narrative": {
+          "headline": "How Distributed Servers Agree on Reality",
+          "subheadline": "When networks partition, every cluster must elect exactly one authoritative leader."
+        },
+        "transition": { "type": "fade", "durationFrames": 15 }
+      },
+      {
+        "id": "scene_02_random_timers",
+        "index": 2,
+        "title": "Randomized Timeouts",
+        "durationFrames": 240,
+        "component": "Scene02RandomTimers",
+        "narrative": {
+          "headline": "Randomized Heartbeat Timeouts Break the Tie",
+          "subheadline": "Each node counts down between 150ms and 300ms, preventing simultaneous split votes."
+        },
+        "transition": { "type": "slide", "durationFrames": 15 }
+      },
+      {
+        "id": "scene_03_quorum_majority",
+        "index": 3,
+        "title": "Quorum Majority",
+        "durationFrames": 160,
+        "component": "Scene03QuorumMajority",
+        "narrative": {
+          "headline": "Majority Quorum Reaches Consensus",
+          "subheadline": "A candidate transitions to Leader when a strict majority of peers grants their vote."
+        },
+        "transition": { "type": "none", "durationFrames": 0 }
+      }
+    ],
+    "assets": []
+  }
+}

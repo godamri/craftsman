@@ -31,6 +31,7 @@ Before executing modifications, inspect the applicable skill:
 - **Database & Concurrency**: .agents/skills/database-craftsman/SKILL.md (Transactions, locking, non-blocking DDL)
 - **Security & Authorization**: .agents/skills/security-craftsman/SKILL.md (Fail-closed checks, input sanitization)
 - **Web & Interface Design**: .agents/skills/web-design-craftsman/SKILL.md (Content-first design, visual hierarchy, light-first default)
+- **Digital Artifact Generation**: .agents/skills/gen-craftsman/SKILL.md (Autonomous artifact creation, technical video storytelling)
 - **Language Crafts**: .agents/skills/{go,python,react,rust}-craftsman/SKILL.md
 - **Infrastructure & Quality**: .agents/skills/{devops,qa,distributed-systems,business}-craftsman/SKILL.md
 - **Intake & Skill Orchestration**: .agents/skills/wizard-craftsman/SKILL.md (Transforms ambiguous or multi-domain requests into bounded execution contracts)

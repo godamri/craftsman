@@ -1,0 +1,3 @@
+how distributed servers agree on reality without split votes.
+
+#distributedsystems #raft #consensus #computerscience #backend
