@@ -35,23 +35,23 @@ Implemented  ≠  Verified  ≠  Validated  ≠  Production Ready
 Every non-trivial engineering task must execute through this iterative loop:
 
 ```text
- 1. PLAN                      --> Identify objective, constraints, and scope boundaries.
+ 1. TASK ORIENTATION (PLAN)   --> Identify objective, constraints, success conditions, and provisional hypothesis.
     ↓
- 2. RECONNAISSANCE (RECON)    --> Inspect existing repository patterns, canonical implementations, and lifecycles.
+ 2. RECONNAISSANCE (RECON)    --> Inspect existing repository capabilities, patterns, and call paths.
     ↓
- 3. DEFINE MILESTONES & BUDGET--> Break work into independent vertical slices with strict change budgets.
+ 3. PRE-FLIGHT CHANGE AUDIT   --> Validate/invalidate hypothesis; audit capability, gap, escalation, and impact.
     ↓
- 4. DEFINE ACCEPTANCE CRITERIA--> Document observable input/state/output behaviors.
+ 4. BOUNDED IMPLEMENTATION PLAN--> Define vertical slices with strict change budgets derived from evidence.
     ↓
- 5. IMPLEMENT NARROW SLICE    --> Write the minimum code required for the current milestone.
+ 5. DEFINE ACCEPTANCE CRITERIA--> Document observable input/state/output behaviors.
     ↓
- 6. VERIFY BEHAVIORAL BOUNDARY--> Execute end-to-end / vertical-slice verification across the component boundary.
+ 6. IMPLEMENT NARROW SLICE    --> Write the minimum code required for the current milestone.
     ↓
- 7. ATTACK / FALSIFY          --> Actively attempt to break the implementation under edge and failure conditions.
+ 7. VERIFY BEHAVIORAL BOUNDARY--> Execute end-to-end / vertical-slice verification across the component boundary.
     ↓
- 8. INVESTIGATE & FIX         --> Form hypotheses, locate root causes, and apply minimal fixes. No blind patching.
+ 8. ATTACK / FALSIFY          --> Actively attempt to break the implementation under edge and failure conditions.
     ↓
- 9. RE-VERIFY                 --> Re-run failed verification scenarios to prove defect elimination.
+ 9. INVESTIGATE & FIX         --> Form hypotheses, locate root causes, and apply minimal fixes. No blind patching.
     ↓
 10. BLAST-RADIUS REGRESSION   --> Run regression suite across previously verified milestones and affected callers.
     ↓
@@ -64,7 +64,7 @@ Every non-trivial engineering task must execute through this iterative loop:
 
 ## The Change Budget & Scope Control
 
-For every milestone, classify all proposed modifications into one of three tiers:
+The implementation plan must come **after** reconnaissance and the Pre-Flight Change Audit, derived from validated repository evidence rather than unverified task hypotheses. For every milestone, classify all proposed modifications into one of three tiers:
 
 - `REQUIRED`: Direct delta strictly necessary to satisfy the current milestone's acceptance criteria.
 - `REQUIRED FOR VERIFICATION`: Harness, test fixtures, or assertions required to prove milestone behavior.
@@ -76,13 +76,47 @@ For every milestone, classify all proposed modifications into one of three tiers
 
 ## The 12 Core Execution Principles
 
-### 1. Plan Before Code & Repository Reconnaissance
-Before modifying files, search the repository for canonical implementations, neighboring modules, established lifecycle patterns, test utilities, configuration conventions, and runtime registrations.  
-Prioritize evidence in this order:
+### 1. Task Orientation, Reconnaissance & Pre-Flight Change Audit
+
+#### A. Task Orientation & Provisional Hypothesis
+Before inspecting code, establish task orientation: objective, user intent, known constraints, success conditions, and a provisional implementation hypothesis.
+> **Hypothesis Invalidation Rule**: The initial implementation hypothesis is provisional and revocable. Pre-flight reconnaissance possesses binding authority to falsify it. The agent **must** revise or discard that hypothesis when repository evidence contradicts it (e.g. initial hypothesis: *"create new endpoint"*; recon discovers an existing endpoint satisfies the required contract $\to$ invalidate the hypothesis and plan around reuse). Never preserve an initial hypothesis merely because it was formed earlier.
+
+#### B. Active Repository Reconnaissance
+Before proposing changes, search the repository to actively establish what already exists, where the requested behavior currently lives, whether existing capabilities can satisfy the requirement, and what boundary actually needs to change. Prioritize evidence:
 ```text
 Existing repository evidence  >  Canonical project patterns  >  Framework documentation  >  Agent assumptions
 ```
-Do not introduce new architectural patterns merely because an existing pattern was not immediately searched.
+Reconnaissance depth must remain proportional to task scope and operational risk.
+
+#### C. The Pre-Flight Change Audit
+Before committing to an implementation plan, validate the proposed change across six gates:
+1. **Existing Capability First**: Can an existing function, service, endpoint, model, DB operation, or configuration satisfy the requirement? Prefer reuse or localized in-place modification over introducing new capabilities.
+2. **Exact Gap Isolation**: What specifically is missing, incorrect, incompatible, or insufficient? Do not expand scope merely because neighboring code could be improved.
+3. **Hypothesis Validation**: Compare the provisional hypothesis against repository evidence. Classify the result as `RETAIN`, `REVISE`, or `INVALIDATE`. Repository evidence has authority over the initial hypothesis.
+4. **Escalation Gate**: Introducing new architectural boundaries (abstractions, services, endpoints, tables, migrations, queues, caches, dependencies) requires repository evidence demonstrating that the existing lower-level path is:
+   - *insufficient* to satisfy the requirement, OR
+   - *incompatible* with an explicit requirement, invariant, or contract, OR
+   - *materially riskier* than the bounded alternative because it introduces materially greater change, coupling, or blast radius.  
+   *(Do not use "technically infeasible" as the sole threshold; evidence of necessity is required).*
+5. **Proportional Impact Trace**: Trace callers, consumers, and state transitions proportionally to the change boundary:
+   - *Local function*: Direct callers.
+   - *Shared helper/service*: Relevant callers and active consumers.
+   - *API contract*: Known consumers and contract boundary.
+   - *DB/state*: Relevant readers, writers, background workers, and state transitions.
+   - *Event/schema*: Producers, consumers, and lifecycle boundary.
+   - *Concurrency/lifecycle*: Synchronization boundaries and state ownership.
+   - *Lifecycle & Persistence Boundaries (Conditional)*: When a proposed change alters deletion, bulk deletion, cleanup, cascade, archival, retention, state transitions, or mutates related entities (dormant for UI, docs, read-only queries, or localized logic without persistence impact):
+     - **Relationship ≠ Ownership ≠ Lifecycle Responsibility**: Foreign keys, nullable associations, ORM relationships, or database cascade settings do *not* establish ownership or cleanup responsibility. Before deleting or cascading to related state, establish the owning aggregate root, creation preconditions, consumer semantics, and existing canonical lifecycle behavior.
+     - **Existing Non-Action is Evidence**: If an established canonical operation (e.g. single-entity delete) does not touch a related entity, treat that boundary as a candidate invariant. Any new or bulk operation that expands lifecycle side effects beyond this canonical baseline requires positive evidence that the additional mutation is required and consistent with domain ownership.
+     - **Scope Selection ≠ Lifecycle Semantics**: Which entities qualify for an operation (e.g. `WHERE status = 'draft'`) is distinct from what happens to each entity and its related state. A valid selection filter never independently justifies cascading mutations to referencing entities.
+     - **Consumer Semantics Over Relational Integrity**: Look beyond whether a deletion satisfies foreign key constraints; evaluate whether removing the row breaks historical records, rotation cooldowns, audit trails, active workflows, or shared projections.
+     - **Creation & Negative-Path Reasoning**: When a cleanup depends on an assumed edge-case state, verify whether normal creation contracts make that state impossible rather than relying on passive absence.
+     - **Runtime Evidence Policy**: Static code, contracts, and tests are primary. Runtime database inspection is conditional and reserved for existential questions (*"does state X occur in observed data?"*); lack of live database access must never block execution.
+     - **Contradiction Check**: Never claim an operation "reuses canonical semantics" if it deletes related entities that the canonical operation preserves. Divergence requires positive evidence.
+     - **Conditional Deletion Boundary Matrix**: When multi-entity deletions involve ambiguous or competing lifecycles, explicitly document: `Entity | Link | Owning Aggregate | Canonical Behavior | Consumer Impact | Proposed Action (DELETE/RETAIN) | Evidence`. (Omit for ordinary, single-table, or unambiguous leaf deletions).  
+   *(Do not perform exhaustive call-graph archaeology for trivial local changes. Unknown external consumers remain `UNKNOWN` rather than invented).*
+6. **Plausible "Not Required" Boundary**: Explicitly identify materially plausible escalation paths that are rejected. Do not ritualistically enumerate every subsystem (DB, Redis, queues, migrations) for trivial tasks; record adjacent boundaries only when materially plausible.
 
 ### 2. Milestone Decomposition & Vertical Slices
 Break complex work into small, cohesive milestones representing end-to-end vertical slices (e.g. Input $\to$ Domain $\to$ Persistence $\to$ Result) rather than horizontal layers (e.g. creating all database tables across the system before writing any logic). Every milestone must leave the repository in a **buildable, runnable, and testable** intermediate state.
@@ -138,14 +172,28 @@ Distinguish strictly between certainty tiers:
 - **`UNKNOWN`**: Insufficient evidence to establish fact.
 Never present an `INFERENCE` as a `FACT`, and never fill an `UNKNOWN` with speculative guesses.
 
+> **Operational Rule for UNKNOWN**: `UNKNOWN` does not automatically mean `STOP`. An `UNKNOWN` blocks progression only when it touches an invariant, contract, ownership, state, or risk boundary that cannot safely be crossed without stronger evidence (e.g. an unknown external consumer with an unchanged internal helper may proceed if other evidence supports safety; an unknown consumer when altering a public API contract requires stronger evidence or clarification before proceeding). Do not introduce unnecessary blocking behavior.
+
 ### 9. Defect Discovery as Evidence of Progress
 When a test or verification step fails, treat it as a discovery of evidence, not a procedural failure. Record the failure, isolate the root cause, determine the blast radius, implement the minimal fix, re-verify the failed test, and execute regression testing. Never conceal a failure or fix from milestone reporting.
 
-### 10. Hypothesis-Driven Debugging
+### 10. Hypothesis-Driven Debugging & Causal Proof
 When verification fails, **never patch code blindly** by guessing random changes. Follow this causal protocol:
 ```text
 Failure  -->  Reproduce  -->  Observe State  -->  Locate Boundary  -->  Form Hypothesis  -->  Validate Hypothesis  -->  Minimal Fix  -->  Re-test
 ```
+
+#### Causal Proof & Invariant Defense (Conditional)
+For non-trivial causal, stateful, concurrent, or branching defects (dormant for simple local bugs, typos, isolated syntax errors, or deterministic defects directly localized by compiler/runtime output), distinguish *investigation* from *causal proof*, and *fix proposal* from *behavioral safety proof*:
+1. **Causal Chain**: Connect the causal sequence (`Observed Symptom → Relevant State → State Transition → Invariant Violation → Downstream Consequence → Observed Symptom`) using structured prose or arrows to demonstrate why the defect occurs.
+2. **Invariant $\to$ Violation $\to$ Repair**: Identify the broken contract (`Expected Invariant → Observed Violation → Repair → Post-Fix Invariant`). If no explicit invariant applies, state so directly.
+3. **Alternative Cause Elimination**: When causal ambiguity exists or multiple plausible explanations could account for the symptom, document competing hypotheses considered and the evidence refuting them. Do not claim a root cause is proven merely because a defect location appears plausible.
+4. **Behavioral Delta & Preservation**: Explicitly identify the behavioral differential:
+   - *Before*: What incorrect behavior occurs.
+   - *After*: What incorrect behavior is eliminated.
+   - *Preserved*: Which adjacent states, fallback paths, or sibling workflows intentionally retain existing behavior.
+5. **Activation Predicates**: Where the fix affects branching or mutable state, define the exact runtime boolean conditions under which the fix activates versus conditions where execution follows existing untouched paths.
+6. **Claim-to-Evidence Linkage**: Anchor material causal claims to concrete evidence (`[FACT: file:line]`, `[OBSERVED: log trace]`, `[VERIFIED: test name]`). A causal claim without direct verification evidence remains `[INFERRED]` or `[UNKNOWN]`, never casually promoted to `[PROVEN]`.
 
 ### 11. Mandatory Blast-Radius Regression Testing
 Closing a milestone requires proving that previous milestones and adjacent modules remain healthy. Regression suites must be selected based on the blast radius of the changes made, covering:
@@ -212,10 +260,21 @@ MILESTONE REPORT: M[X] — [Milestone Name]
    - [TESTED | NOT APPLICABLE | NOT TESTED | UNKNOWN] [Concurrency race / rollback behavior]
 
 4. DEFECTS DISCOVERED & RESOLVED:
+   [For trivial/deterministic defects, use the standard format:]
    - Defect: [Description of failure encountered]
    - Root Cause: [Hypothesis verified by inspection/test]
    - Minimal Fix: [Smallest justified change applied]
    - Re-Verification: [Result of re-running failed test]
+
+   [For non-trivial causal/stateful defects, expose causal proof:]
+   - Defect & Symptom: [Observed failure with evidence anchor]
+   - Causal Chain: [Symptom -> State -> Transition -> Violation -> Downstream Impact]
+   - Invariant / Violation / Repair: [Expected Invariant -> Observed Violation -> Repair]
+   - Competing Causes Evaluated: [Plausible alternatives refuted by evidence; or N/A if unambiguous]
+   - Behavioral Delta & Preserved Paths: [What changes vs what intentionally stays untouched]
+   - Evidence Anchors: [File:line, reproduction test, or log trace establishing causality]
+   - Re-Verification: [Result of reproduction test + regression suite]
+   *(Note: A state/path matrix may be included only when materially clarifying multiple interacting branches or fallback transitions; otherwise omit).*
 
 5. REGRESSION & BLAST RADIUS:
    - Regression Suite: [List of test suites executed]
@@ -288,6 +347,9 @@ FINAL ENGINEERING REPORT
 6. **PROHIBITED**: Continuing implementation after milestone exit criteria are satisfied without new evidence or explicit user instruction.
 7. **PROHIBITED**: Concealing discovered defects, intermittent test failures, or environmental gaps from milestone and final engineering reports.
 8. **PROHIBITED**: Generating decorative ASCII banners, obvious syntax restatements, or low-information noise in code comments and milestone reports.
+9. **PROHIBITED**: Emitting an implementation plan or escalating architectural boundaries before completing reconnaissance and the Pre-Flight Change Audit, or preserving an initial hypothesis invalidated by repository evidence.
+10. **PROHIBITED**: Deleting or cascading mutations to related entities based solely on relational references (foreign keys, ORM relationships, nullable links) without establishing aggregate ownership, consumer semantics, and accounting for existing canonical lifecycle boundaries.
+11. **PROHIBITED**: Classifying a non-trivial causal root cause as `PROVEN` or claiming behavioral fix safety merely because a plausible defect location was found, without demonstrating the causal chain, relevant evidence anchors, and unaffected sibling behavior.
 
 ---
 
@@ -295,6 +357,7 @@ FINAL ENGINEERING REPORT
 
 Before certifying any milestone or closing an engineering task:
 
+- [ ] **Pre-Flight Audit Completed**: Was the provisional hypothesis tested against existing code, with escalations justified and proportional impact mapped before planning?
 - [ ] **Recon Completed**: Were existing repository patterns, canonical implementations, and lifecycles inspected before writing code?
 - [ ] **Change Budget Bounded**: Are all modifications strictly classified as `REQUIRED` or `REQUIRED FOR VERIFICATION`, with optional improvements deferred?
 - [ ] **Acceptance Criteria Observable**: Are all criteria defined as explicit input $\to$ state transition $\to$ output behaviors?
